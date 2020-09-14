@@ -2,6 +2,12 @@
   "name": "checkin",
   "version": "0.4.0",
   "private": true,
+  "jest": {
+    "preset": "react-native",
+    "setupFilesAfterEnv": [
+      "@testing-library/jest-native/extend-expect"
+    ]
+  },
   "scripts": {
     "build:apk": "cd android && ./gradlew assembleRelease",
     "flow": "flow",
@@ -43,11 +49,14 @@
   },
   "devDependencies": {
     "@babel/cli": "^7.10.1",
-    "@babel/core": "^7.10.1",
+    "@babel/core": "^7.11.6",
+    "@babel/preset-env": "^7.11.5",
     "@babel/preset-flow": "^7.10.1",
     "@babel/runtime": "^7.10.1",
+    "@testing-library/jest-native": "^3.4.2",
+    "@testing-library/react-native": "^7.0.2",
     "babel-eslint": "^10.1.0",
-    "babel-jest": "^26.0.1",
+    "babel-jest": "^26.3.0",
     "eslint": "^7.1.0",
     "eslint-config-standard": "^14.1.1",
     "eslint-plugin-import": "^2.20.2",
@@ -62,8 +71,5 @@
     "metro-react-native-babel-preset": "^0.63.0",
     "patch-package": "^6.2.2",
     "react-test-renderer": "16.13.1"
-  },
-  "jest": {
-    "preset": "react-native"
   }
 }
