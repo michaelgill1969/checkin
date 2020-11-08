@@ -1,23 +1,77 @@
-import React from 'react'
 import * as ActionTypes from '../redux/ActionTypes'
 import { Device } from '../redux/deviceReducer'
 
 describe(
   'device reducer',
   () => {
-    const initialState = Device(undefined, {})
+    const state = {
+      errorMessage: '',
+      token: ''
+    }
 
     it(
-      'requests to initialize store',
+      'should return the initial state',
       () => {
-        const result = Device(
-          initialState, ActionTypes.INITIALIZE_STORE_REQUESTED
+        expect(Device(undefined, {})).toEqual(
+          state
+        )
+      }
+    )
+
+    it(
+      'should handle INITIALIZE_STORE_REQUESTED',
+      () => {
+        const received = Device(
+          undefined,
+          {
+            type: ActionTypes.INITIALIZE_STORE_REQUESTED
+          }
         )
 
-        expect(result).toEqual(
+        expect(received).toEqual(
           {
-            ...initialState,
+            ...state,
             errorMessage: ''
+          }
+        )
+      }
+    )
+
+    it(
+      'should handle INITIALIZE_STORE_REJECTED',
+      () => {
+        const received = Device(
+          undefined,
+          {
+            type: ActionTypes.INITIALIZE_STORE_REJECTED,
+            errorMessage: 'An error was thrown.'
+          }
+        )
+
+        expect(received).toEqual(
+          {
+            ...state,
+            errorMessage: 'An error was thrown.'
+          }
+        )
+      }
+    )
+
+    it(
+      'should handle INITIALIZE_STORE_FULFILLED',
+      () => {
+        const received = Device(
+          undefined,
+          {
+            type: ActionTypes.INITIALIZE_STORE_FULFILLED,
+            deviceToken: '1234'
+          }
+        )
+
+        expect(received).toEqual(
+          {
+            errorMessage: '',
+            token: '1234'
           }
         )
       }
