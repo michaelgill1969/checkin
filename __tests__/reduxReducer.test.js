@@ -1,5 +1,6 @@
 import * as ActionTypes from '../redux/ActionTypes'
 import { Auth } from '../redux/authReducer'
+import { Buddy } from '../redux/buddyReducer'
 import { Device } from '../redux/deviceReducer'
 
 describe(
@@ -76,13 +77,156 @@ describe(
         )
       }
     )
+
+    it(
+      'handles SIGNIN_REQUESTED',
+      () => {
+        const received = Auth(
+          undefined,
+          {
+            type: ActionTypes.SIGNIN_REQUESTED
+          }
+        )
+
+        expect(received).toEqual(
+          {
+            ...expectedState,
+            errorMessage: ''
+          }
+        )
+      }
+    )
+
+    it(
+      'handles SIGNIN_REJECTED',
+      () => {
+        const received = Auth(
+          undefined,
+          {
+            type: ActionTypes.SIGNIN_REJECTED,
+            errorMessage: 'An error was thrown.'
+          }
+        )
+
+        expect(received).toEqual(
+          {
+            ...expectedState,
+            errorMessage: 'An error was thrown.'
+          }
+        )
+      }
+    )
+
+    it(
+      'handles SIGNIN_FULFILLED',
+      () => {
+        const received = Auth(
+          initialState,
+          {
+            type: ActionTypes.SIGNIN_FULFILLED,
+            user: { user: { email: 'a@a.aa', uid: 'some string' } }
+          }
+        )
+
+        expect(received).toEqual(
+          {
+            errorMessage: '',
+            user: { email: 'a@a.aa', uid: 'some string' }
+          }
+        )
+      }
+    )
+
+    it(
+      'handles SIGNOUT_REQUESTED',
+      () => {
+        const received = Auth(
+          undefined,
+          {
+            type: ActionTypes.SIGNOUT_REQUESTED
+          }
+        )
+
+        expect(received).toEqual(
+          {
+            ...expectedState,
+            errorMessage: ''
+          }
+        )
+      }
+    )
+
+    it(
+      'handles SIGNOUT_REJECTED',
+      () => {
+        const received = Auth(
+          undefined,
+          {
+            type: ActionTypes.SIGNOUT_REJECTED,
+            errorMessage: 'An error was thrown.'
+          }
+        )
+
+        expect(received).toEqual(
+          {
+            ...expectedState,
+            errorMessage: 'An error was thrown.'
+          }
+        )
+      }
+    )
+
+    it(
+      'handles SIGNOUT_FULFILLED',
+      () => {
+        const received = Auth(
+          initialState,
+          {
+            type: ActionTypes.SIGNOUT_FULFILLED,
+            user: { user: { email: 'a@a.aa', uid: 'some string' } }
+          }
+        )
+
+        expect(received).toEqual(
+          {
+            errorMessage: '',
+            user: null
+          }
+        )
+      }
+    )
+  }
+)
+
+describe(
+  'buddy reducer',
+  () => {
+    const initialState = {
+      alertTimes: [],
+      checkinInterval: null,
+      checkinTime: '',
+      email: '',
+      errorMessage: '',
+      isAdded: null,
+      lastAlertTime: '',
+      snooze: 9
+    }
+
+    it(
+      'returns initial state;',
+      () => {
+        expect(Buddy(undefined, {})).toEqual(
+          initialState
+        )
+      }
+    )
   }
 )
 
 describe(
   'device reducer',
   () => {
-    const state = {
+    const initialState = {
       errorMessage: '',
       token: ''
     }
@@ -91,7 +235,7 @@ describe(
       'returns initial state;',
       () => {
         expect(Device(undefined, {})).toEqual(
-          state
+          initialState
         )
       }
     )
@@ -108,7 +252,7 @@ describe(
 
         expect(received).toEqual(
           {
-            ...state,
+            ...initialState,
             errorMessage: ''
           }
         )
@@ -128,7 +272,7 @@ describe(
 
         expect(received).toEqual(
           {
-            ...state,
+            ...initialState,
             errorMessage: 'An error was thrown.'
           }
         )
