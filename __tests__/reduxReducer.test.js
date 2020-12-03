@@ -2,6 +2,7 @@ import * as ActionTypes from '../redux/ActionTypes'
 import { Auth } from '../redux/authReducer'
 import { Buddy } from '../redux/buddyReducer'
 import { Device } from '../redux/deviceReducer'
+import { Inputs } from '../redux/inputsReducer'
 
 describe(
   'auth reducer',
@@ -475,8 +476,357 @@ describe(
 
         expect(receivedState).toEqual(
           {
+            ...expectedState,
             errorMessage: '',
             token: '1234'
+          }
+        )
+      }
+    )
+  }
+)
+
+describe(
+  'inputs reducer',
+  () => {
+    const initialState = Inputs(undefined, {})
+    const expectedState = {
+      alertTimes: [],
+      errorMessage: '',
+      height: 0,
+      showTip: true
+    }
+
+    it(
+      'returns initial state',
+      () => expect(initialState).toEqual(expectedState)
+    )
+
+    it(
+      'handles HIDE_TIP_REQUESTED',
+      () => {
+        const receivedState = Inputs(
+          undefined,
+          {
+            type: ActionTypes.HIDE_TIP_REQUESTED
+          }
+        )
+
+        expect(receivedState).toEqual(
+          {
+            ...initialState,
+            errorMessage: ''
+          }
+        )
+      }
+    )
+
+    it(
+      'handles HIDE_TIP_REJECTED',
+      () => {
+        const receivedState = Inputs(
+          undefined,
+          {
+            type: ActionTypes.HIDE_TIP_REJECTED,
+            errorMessage: 'An error was thrown.'
+          }
+        )
+
+        expect(receivedState).toEqual(
+          {
+            ...expectedState,
+            errorMessage: 'An error was thrown.'
+          }
+        )
+      }
+    )
+
+    it(
+      'handles HIDE_TIP_FULFILLED',
+      () => {
+        const receivedState = Inputs(
+          initialState,
+          {
+            type: ActionTypes.HIDE_TIP_FULFILLED
+          }
+        )
+
+        expect(receivedState).toEqual(
+          {
+            ...expectedState,
+            errorMessage: '',
+            showTip: false
+          }
+        )
+      }
+    )
+
+    it(
+      'handles MUTATE_INPUTS_REQUESTED',
+      () => {
+        const receivedState = Inputs(
+          undefined,
+          {
+            type: ActionTypes.MUTATE_INPUTS_REQUESTED
+          }
+        )
+
+        expect(receivedState).toEqual(
+          {
+            ...initialState,
+            errorMessage: ''
+          }
+        )
+      }
+    )
+
+    it(
+      'handles MUTATE_INPUTS_REJECTED',
+      () => {
+        const receivedState = Inputs(
+          undefined,
+          {
+            type: ActionTypes.MUTATE_INPUTS_REJECTED,
+            errorMessage: 'An error was thrown.'
+          }
+        )
+
+        expect(receivedState).toEqual(
+          {
+            ...expectedState,
+            errorMessage: 'An error was thrown.'
+          }
+        )
+      }
+    )
+
+    it(
+      'handles MUTATE_INPUTS_FULFILLED',
+      () => {
+        const now = (new Date()).toISOString()
+        const receivedState = Inputs(
+          initialState,
+          {
+            type: ActionTypes.MUTATE_INPUTS_FULFILLED,
+            inputs: [
+              {
+                id: '1234',
+                time: now,
+                validity: true
+              }
+            ]
+          }
+        )
+
+        expect(receivedState).toEqual(
+          {
+            ...expectedState,
+            alertTimes: [
+              {
+                id: '1234',
+                time: now,
+                validity: true
+              }
+            ],
+            errorMessage: ''
+          }
+        )
+      }
+    )
+
+    it(
+      'handles REMOVE_INPUTS_REQUESTED',
+      () => {
+        const receivedState = Inputs(
+          undefined,
+          {
+            type: ActionTypes.REMOVE_INPUTS_REQUESTED
+          }
+        )
+
+        expect(receivedState).toEqual(
+          {
+            ...initialState,
+            errorMessage: ''
+          }
+        )
+      }
+    )
+
+    it(
+      'handles REMOVE_INPUTS_REJECTED',
+      () => {
+        const receivedState = Inputs(
+          undefined,
+          {
+            type: ActionTypes.REMOVE_INPUTS_REJECTED,
+            errorMessage: 'An error was thrown.'
+          }
+        )
+
+        expect(receivedState).toEqual(
+          {
+            ...expectedState,
+            errorMessage: 'An error was thrown.'
+          }
+        )
+      }
+    )
+
+    it(
+      'handles REMOVE_INPUTS_FULFILLED',
+      () => {
+        const now = (new Date()).toISOString()
+        const receivedState = Inputs(
+          initialState,
+          {
+            type: ActionTypes.REMOVE_INPUTS_FULFILLED,
+            inputs: [
+              {
+                id: '1234',
+                time: now,
+                validity: true
+              }
+            ]
+          }
+        )
+
+        expect(receivedState).toEqual(
+          {
+            ...expectedState,
+            alertTimes: [
+              {
+                id: '1234',
+                time: now,
+                validity: true
+              }
+            ],
+            errorMessage: ''
+          }
+        )
+      }
+    )
+
+    it(
+      'handles SET_INPUT_PARAMETERS_REQUESTED',
+      () => {
+        const receivedState = Inputs(
+          undefined,
+          {
+            type: ActionTypes.SET_INPUT_PARAMETERS_REQUESTED
+          }
+        )
+
+        expect(receivedState).toEqual(
+          {
+            ...initialState,
+            errorMessage: ''
+          }
+        )
+      }
+    )
+
+    it(
+      'handles SET_INPUT_PARAMETERS_REJECTED',
+      () => {
+        const receivedState = Inputs(
+          undefined,
+          {
+            type: ActionTypes.SET_INPUT_PARAMETERS_REJECTED,
+            errorMessage: 'An error was thrown.'
+          }
+        )
+
+        expect(receivedState).toEqual(
+          {
+            ...expectedState,
+            errorMessage: 'An error was thrown.'
+          }
+        )
+      }
+    )
+
+    it(
+      'handles SET_INPUT_PARAMETERS_FULFILLED',
+      () => {
+        const receivedState = Inputs(
+          initialState,
+          {
+            type: ActionTypes.SET_INPUT_PARAMETERS_FULFILLED,
+            height: 42
+          }
+        )
+
+        expect(receivedState).toEqual(
+          {
+            ...expectedState,
+            height: 42,
+            errorMessage: ''
+          }
+        )
+      }
+    )
+
+    it(
+      'handles SIGNOUT_REQUESTED',
+      () => {
+        const receivedState = Inputs(
+          undefined,
+          {
+            type: ActionTypes.SIGNOUT_REQUESTED
+          }
+        )
+
+        expect(receivedState).toEqual(
+          {
+            ...initialState,
+            errorMessage: ''
+          }
+        )
+      }
+    )
+
+    it(
+      'handles SIGNOUT_REJECTED',
+      () => {
+        const receivedState = Inputs(
+          undefined,
+          {
+            type: ActionTypes.SIGNOUT_REJECTED,
+            errorMessage: 'An error was thrown.'
+          }
+        )
+
+        expect(receivedState).toEqual(
+          {
+            ...expectedState,
+            errorMessage: 'An error was thrown.'
+          }
+        )
+      }
+    )
+
+    it(
+      'handles SIGNOUT_FULFILLED',
+      () => {
+        const receivedState = Inputs(
+          initialState,
+          {
+            type: ActionTypes.SIGNOUT_FULFILLED,
+            alertTimes: [],
+            errorMessage: '',
+            height: null,
+            showTip: true
+          }
+        )
+
+        expect(receivedState).toEqual(
+          {
+            ...expectedState,
+            alertTimes: [],
+            errorMessage: '',
+            height: null,
+            showTip: true
           }
         )
       }
