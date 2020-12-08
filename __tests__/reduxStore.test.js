@@ -1,3 +1,4 @@
+// TODO: Investigate type error in Jest output.
 import { ConfigureStore } from '../redux/configureStore'
 
 describe(
@@ -90,7 +91,7 @@ describe(
 
     it(
       'returns initial state',
-      async () => expect(initialState).toEqual(expectedState)
+      async () => await expect(initialState).toEqual(expectedState)
     )
   }
 )
