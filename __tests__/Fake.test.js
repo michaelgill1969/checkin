@@ -1,6 +1,6 @@
 import React from 'react'
 import 'react-native-gesture-handler'
-import { render, cleanup  } from '@testing-library/react-native'
+import { render, cleanup } from '@testing-library/react-native'
 import Fake from '../Fake'
 // import App from '../App'
 
@@ -38,7 +38,7 @@ jest.mock(
       /* Other */
       FlatList: View,
       gestureHandlerRootHOC: jest.fn(),
-      Directions: {},
+      Directions: {}
     }
   }
 )
