@@ -167,9 +167,13 @@ const rootReducer = combineReducers(
 )
 
 export const ConfigureStore = () => {
+  const middlewares = [thunk]
+  if (process.env.NODE_ENV !== 'test') {
+    middlewares.push(logger)
+  }
   const store: Store = createStore(
     rootReducer,
-    applyMiddleware(thunk, logger)
+    applyMiddleware(...middlewares)
   )
   const persistor: Persistor = persistStore(store)
 
