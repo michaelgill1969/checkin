@@ -134,3 +134,52 @@ describe(
     )
   }
 )
+
+describe(
+  'get-document creator',
+  () => {
+    it(
+      'should create an action to request getting a document',
+      () => {
+        const expectedAction = {
+          type: ActionTypes.GET_DOCUMENT_REQUESTED
+        }
+
+        expect(ActionCreators.getDocumentRequested()).toEqual(expectedAction)
+      }
+    )
+
+    it(
+      'should create an action to reject getting a document',
+      () => {
+        const errorMessage = 'An error was thrown.'
+        const expectedAction = {
+          type: ActionTypes.GET_DOCUMENT_REJECTED,
+          errorMessage: errorMessage
+        }
+
+        expect(ActionCreators.getDocumentRejected(errorMessage))
+          .toEqual(expectedAction)
+      }
+    )
+
+    it(
+      'should create an action to fulfill getting a document',
+      () => {
+        const now = (new Date()).toISOString()
+        const data = [[], 42, now, true, 42]
+        const expectedAction = {
+          type: ActionTypes.GET_DOCUMENT_FULFILLED,
+          alertTimes: data[1],
+          checkinInterval: data[2],
+          checkinTime: data[3],
+          isAdded: data[0],
+          snooze: data[4]
+        }
+
+        expect(ActionCreators.getDocumentFulfilled(data))
+          .toEqual(expectedAction)
+      }
+    )
+  }
+)
