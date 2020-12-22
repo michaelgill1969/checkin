@@ -958,7 +958,7 @@ describe(
           initialState,
           {
             type: ActionTypes.SET_LISTENER_FULFILLED,
-            listeners: ['123', '456']
+            listeners: [123, 456]
           }
         )
 
@@ -966,7 +966,7 @@ describe(
           {
             ...expectedState,
             errorMessage: '',
-            listeners: ['123', '456']
+            listeners: [123, 456]
           }
         )
       }
@@ -1155,7 +1155,7 @@ describe(
           initialState,
           {
             type: ActionTypes.SET_TIMER_FULFILLED,
-            timers: ['123', '456']
+            timers: [123, 456]
           }
         )
 
@@ -1163,7 +1163,7 @@ describe(
           {
             ...expectedState,
             errorMessage: '',
-            timers: ['123', '456']
+            timers: [123, 456]
           }
         )
       }
