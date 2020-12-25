@@ -20,9 +20,9 @@ describe(
     it(
       'does not return null',
       async () => {
-        const result = ActionThunks.add-buddy('a@a.aa') // Promise.resolve('something')
+        const result = ActionThunks.addBuddy('a@a.aa') // TODO: Fails probably because Firestore is not mocked.
 
-	expect(result).not.toBe(null)
+        expect(result).not.toBe(null)
       }
     )
   }
