@@ -14,13 +14,15 @@ jest.mock(
   }
 )
 
+jest.mock('react-native/Libraries/EventEmitter/NativeEventEmitter')
+
 describe(
   'redux store dispatch',
   () => {
     it(
       'does not return null',
       async () => {
-        const result = ActionThunks.addBuddy('a@a.aa') // TODO: Fails probably because Firestore is not mocked.
+        const result = ActionThunks.addBuddy('a@a.aa')
 
         expect(result).not.toBe(null)
       }
