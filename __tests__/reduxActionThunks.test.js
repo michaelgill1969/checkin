@@ -1,7 +1,11 @@
 // import auth from '@react-native-firebase/auth'
 // import db from '@react-native-firebase/firestore'
-import { ConfigureStore } from '../redux/configureStore'
+import * as firebase from '@firebase/testing'
 import * as ActionThunks from '../redux/ActionThunks'
+import { ConfigureStore } from '../redux/configureStore'
+
+const MY_PROJECT_ID = 'cryonics-check-in-dev-0-0-2'
+const email = 'a@a.aa'
 
 const expectedState = {
   auth: {
@@ -90,7 +94,6 @@ describe(
     it(
       'updates buddy',
       async () => {
-        const email = 'a@a.aa'
         const initialState = await ConfigureStore().store.getState()
 
         await ActionThunks.addBuddy(email)
@@ -116,7 +119,6 @@ describe(
 describe(
   'add-document thunk',
   () => {
-    const email = 'a@a.aa'
     const now = (new Date()).toISOString()
     const user = {
       checkinTime: now,
@@ -148,6 +150,30 @@ describe(
             snooze: user.snooze
           }
         )
+      }
+    )
+
+    it(
+      'reads Firestore',
+      async () => {
+        const now = (new Date()).toISOString()
+        const db =
+          firebase.initializeTestApp({ projectId: MY_PROJECT_ID }).firestore()
+        const testDoc = db.collection('users').doc(email)
+
+        await firebase.assertSucceeds(testDoc.get())
+      }
+    )
+
+    it(
+      'does not write Firestore',
+      async () => {
+        const now = (new Date()).toISOString()
+        const db =
+          firebase.initializeTestApp({ projectId: MY_PROJECT_ID }).firestore()
+        const testDoc = db.collection('users').doc(email)
+
+        await firebase.assertFails(testDoc.set({ checkinTime: now }))
       }
     )
 
