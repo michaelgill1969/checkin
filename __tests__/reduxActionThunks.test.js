@@ -156,7 +156,6 @@ describe(
     it(
       'reads Firestore',
       async () => {
-        const now = (new Date()).toISOString()
         const db =
           firebase.initializeTestApp({ projectId: MY_PROJECT_ID }).firestore()
         const testDoc = db.collection('users').doc(email)
