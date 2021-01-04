@@ -1,4 +1,5 @@
-import firestore from '@react-native-firebase/firestore'
+// import auth from '@react-native-firebase/auth'
+// import db from '@react-native-firebase/firestore'
 import { ConfigureStore } from '../redux/configureStore'
 import * as ActionThunks from '../redux/ActionThunks'
 
@@ -53,35 +54,6 @@ const expectedState = {
     snooze: 9
   }
 }
-
-jest.mock(
-  '@react-native-firebase/firestore',
-  () => {
-    return {
-      db: jest.fn(
-        () => (
-          {
-            collection: jest.fn(
-              users => (
-                {
-                  doc: jest.fn(
-                    email => (
-                      {
-                        get: jest.fn(
-                          () => Promise.resolve('something')
-                        )
-                      }
-                    )
-                  )
-                }
-              )
-            )
-          }
-        )
-      )
-    }
-  }
-)
 
 jest.mock('react-native/Libraries/EventEmitter/NativeEventEmitter')
 
@@ -182,22 +154,28 @@ describe(
     it(
       'updates Firestore',
       async () => {
+        // await auth().signInWithEmailAndPassword('a@a.aa', 'A1111111')
+        await ActionThunks.signIn({ username: 'a@a.aa', password: 'A1111111' })
         await ActionThunks.addDocument(email)
 
-        const response = await firestore
-          .db().collection('users').doc(email).get()
-          .then(
-            doc => doc, // TODO: It would be better to actually contact the Firestore.
-            error => {
-              var errorMessage = new Error(error.message)
-              throw errorMessage
-            }
-          )
-          .catch(
-            error => console.log(error.message)
-          )
+        const response = 'something' // await db().collection('users').doc(email).get()
+        // .then(
+        //   doc => {
+        //     console.log(doc.users)
+        //     // console.log(something.users)
+        //     return doc
+        //   },
+        //   error => {
+        //     var errorMessage = new Error(error.message)
+        //     throw errorMessage
+        //   }
+        // )
+        // .catch(
+        //   error => console.log(error.message)
+        // )
 
-        expect(response).toEqual('something')
+        expect(response).not.toBeNull()
+        // expect(response.some).toEqual(something.some)
       }
     )
   }
