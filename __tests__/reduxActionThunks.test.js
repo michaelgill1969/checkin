@@ -4,8 +4,19 @@ import * as firebase from '@firebase/testing'
 import * as ActionThunks from '../redux/ActionThunks'
 import { ConfigureStore } from '../redux/configureStore'
 
-const MY_PROJECT_ID = 'cryonics-check-in-dev-0-0-2'
-const email = 'a@a.aa'
+const PROJECT_ID = 'cryonics-check-in-dev-0-0-2'
+const email1 = 'a@a.aa'
+const email2 = 'b@b.bb'
+const uid1 = email1
+const uid2 = email2
+const auth1 = { uid: uid1, email: email1 }
+const auth2 = { uid: uid2, email: email2 }
+
+function getFirestore (auth) {
+  return firebase
+    .initializeTestApp({ projectId: PROJECT_ID, auth: auth })
+    .firestore()
+}
 
 const expectedState = {
   auth: {
@@ -59,6 +70,10 @@ const expectedState = {
   }
 }
 
+// beforeEach(
+//   async () => await firebase.clearFirestoreData({ projectId: PROJECT_ID })
+// )
+
 jest.mock('react-native/Libraries/EventEmitter/NativeEventEmitter')
 
 jest.mock(
@@ -96,18 +111,18 @@ describe(
       async () => {
         const initialState = await ConfigureStore().store.getState()
 
-        await ActionThunks.addBuddy(email)
+        await ActionThunks.addBuddy(email1)
 
         expect(
           {
             ...initialState,
-            email: email,
+            email: email1,
             errorMessage: ''
           }
         ).toEqual(
           {
             ...expectedState,
-            email: email,
+            email: email1,
             errorMessage: ''
           }
         )
@@ -131,7 +146,7 @@ describe(
       async () => {
         const initialState = await ConfigureStore().store.getState()
 
-        await ActionThunks.addDocument(email)
+        await ActionThunks.addDocument(email1)
 
         expect(
           {
@@ -156,9 +171,10 @@ describe(
     it(
       'reads Firestore',
       async () => {
-        const db =
-          firebase.initializeTestApp({ projectId: MY_PROJECT_ID }).firestore()
-        const testDoc = db.collection('users').doc(email)
+        await firebase.clearFirestoreData({ projectId: PROJECT_ID })
+
+        const db = getFirestore(null)
+        const testDoc = db.collection('users').doc(email1)
 
         await firebase.assertSucceeds(testDoc.get())
       }
@@ -167,10 +183,37 @@ describe(
     it(
       'does not write Firestore',
       async () => {
+        await firebase.clearFirestoreData({ projectId: PROJECT_ID })
+
         const now = (new Date()).toISOString()
-        const db =
-          firebase.initializeTestApp({ projectId: MY_PROJECT_ID }).firestore()
-        const testDoc = db.collection('users').doc(email)
+        const db = getFirestore(null)
+        const testDoc = db.collection('users').doc(email1)
+
+        await firebase.assertFails(testDoc.set({ checkinTime: now }))
+      }
+    )
+
+    it(
+      'writes to user document with same ID as user',
+      async () => {
+        await firebase.clearFirestoreData({ projectId: PROJECT_ID })
+
+        const now = (new Date()).toISOString()
+        const db = getFirestore(auth1)
+        const testDoc = db.collection('users').doc(email1)
+
+        await firebase.assertSucceeds(testDoc.set({ checkinTime: now }))
+      }
+    )
+
+    it(
+      'does not write to user document with different ID as user',
+      async () => {
+        await firebase.clearFirestoreData({ projectId: PROJECT_ID })
+
+        const now = (new Date()).toISOString()
+        const db = getFirestore(auth2)
+        const testDoc = db.collection('users').doc(email1)
 
         await firebase.assertFails(testDoc.set({ checkinTime: now }))
       }
@@ -179,29 +222,22 @@ describe(
     it(
       'updates Firestore',
       async () => {
-        // await auth().signInWithEmailAndPassword('a@a.aa', 'A1111111')
-        await ActionThunks.signIn({ username: 'a@a.aa', password: 'A1111111' })
-        await ActionThunks.addDocument(email)
+        await firebase.clearFirestoreData({ projectId: PROJECT_ID })
 
-        const response = 'something' // await db().collection('users').doc(email).get()
-        // .then(
-        //   doc => {
-        //     console.log(doc.users)
-        //     // console.log(something.users)
-        //     return doc
-        //   },
-        //   error => {
-        //     var errorMessage = new Error(error.message)
-        //     throw errorMessage
-        //   }
-        // )
-        // .catch(
-        //   error => console.log(error.message)
-        // )
+        const db = getFirestore(auth1)
+        const testDoc = db.collection('users').doc(email1)
+        // await testDoc.set({ checkinTime: now })
 
-        expect(response).not.toBeNull()
-        // expect(response.some).toEqual(something.some)
+        await ActionThunks.signIn({ username: email1, password: 'A1111111' })
+        await ActionThunks.addDocument(email1)
+
+        // await testDoc.get().then(doc => console.log(doc))
+        await firebase.assertSucceeds(testDoc.get())
       }
     )
   }
 )
+
+// afterAll(
+//   async () => await firebase.clearFirestoreData({ projectId: PROJECT_ID })
+// )
