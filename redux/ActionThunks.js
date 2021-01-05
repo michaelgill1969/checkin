@@ -50,10 +50,11 @@ const exists = (object) => {
  * @param  {String}   email E-mail of the buddy to be added.
  * @return {Promise}        A promise to add a buddy to be tracked by standby.
  */
-export const addBuddy = (email: string) => (dispatch, getState) => {
-  dispatch(ActionCreators.addBuddyRequested())
-
-  return Promise.resolve(dispatch(setListener(email)))
+export const addBuddy = (
+  email: string,
+  testStore = null
+) => (dispatch, getState) => {
+  return Promise.resolve(dispatch(setListener(email, testStore)))
     .then(
       () => dispatch(ActionCreators.addBuddyFulfilled(email)),
       error => {
@@ -203,10 +204,15 @@ export const checkin = () => (dispatch, getState) => {
  */
 // TODO: Can do better with the database rules for Firestore?
 // https://firebase.google.com/docs/firestore/security/overview
-export const getDocument = (email: string) => (dispatch, getState) => {
+export const getDocument = (
+  email: string,
+  testStore = null
+) => (dispatch, getState) => {
   dispatch(ActionCreators.getDocumentRequested())
 
-  return db().collection('users').doc(email).get()
+  const firestore = testStore === null ? db() : testStore
+
+  return firestore.collection('users').doc(email).get()
     .then(
       doc => {
         if (doc.exists) {
@@ -216,7 +222,7 @@ export const getDocument = (email: string) => (dispatch, getState) => {
             console.log('Subscriber defined!')
           } else {
             console.log('Subscriber undefined!')
-            db().collection('users').doc(email).update({ subscribers: {} })
+            firestore.collection('users').doc(email).update({ subscribers: {} })
           }
         } else {
           // doc.data() will be undefined in this case
@@ -245,7 +251,7 @@ export const getDocument = (email: string) => (dispatch, getState) => {
               doc.data().subscribers[uid].includes(token)
                 ? doc.data().subscribers[uid]
                 : doc.data().subscribers[uid].concat([token])
-            db().collection('users').doc(email).update(
+            firestore.collection('users').doc(email).update(
               {
                 ['subscribers.' + uid]: subscriberData
               }
@@ -253,7 +259,7 @@ export const getDocument = (email: string) => (dispatch, getState) => {
           } else {
             console.log('Subscriber undefined!')
             const subscriberData = [getState().device.token]
-            db().collection('users').doc(email).update(
+            firestore.collection('users').doc(email).update(
               {
                 ['subscribers.' + uid]: subscriberData
               }
@@ -618,6 +624,7 @@ export const setLastAlertTime = (lastAlertTime: string) => dispatch => {
  */
 export const setListener = (
   email: string,
+  testStore = null,
   isTest: boolean = false
 ) => (dispatch, getState) => {
   const noCheckinAlert = () => {
@@ -641,7 +648,7 @@ export const setListener = (
   dispatch(ActionCreators.setListenerRequested())
 
   return Promise.resolve(
-    dispatch(getDocument(email))
+    dispatch(getDocument(email, testStore))
   )
     .then(
       () => {
@@ -678,7 +685,7 @@ export const setListener = (
               const listener = Promise.resolve(
                 setTimeout(
                   () => {
-                    dispatch(setListener(email, isTest))
+                    dispatch(setListener(email, testStore, isTest))
                   },
                   interval
                 )
