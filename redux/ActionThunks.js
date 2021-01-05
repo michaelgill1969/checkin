@@ -57,7 +57,7 @@ export const addBuddy = (email: string) => (dispatch, getState) => {
     .then(
       () => dispatch(ActionCreators.addBuddyFulfilled(email)),
       error => {
-        var errorMessage = new Error(error.message)
+        const errorMessage = new Error(error.message)
         throw errorMessage
       }
     )
@@ -132,14 +132,14 @@ export const addDocument = (email: string) => (dispatch, getState) => {
         }
       },
       error => {
-        var errorMessage = new Error(error.message)
+        const errorMessage = new Error(error.message)
         throw errorMessage
       }
     )
     .then(
       () => dispatch(ActionCreators.addDocumentFulfilled(user)),
       error => {
-        var errorMessage = new Error(error.message)
+        const errorMessage = new Error(error.message)
         throw errorMessage
       }
     )
@@ -170,21 +170,21 @@ export const checkin = () => (dispatch, getState) => {
         { wasCheckedForAlerts: false }
       ),
       error => {
-        var errorMessage = new Error(error.message)
+        const errorMessage = new Error(error.message)
         throw errorMessage
       }
     )
     .then(
       () => dispatch(removeTimers()),
       error => {
-        var errorMessage = new Error(error.message)
+        const errorMessage = new Error(error.message)
         throw errorMessage
       }
     )
     .then(
       () => dispatch(ActionCreators.checkinFulfilled(user.checkinTime)),
       error => {
-        var errorMessage = new Error(error.message)
+        const errorMessage = new Error(error.message)
         throw errorMessage
       }
     )
@@ -225,7 +225,7 @@ export const getDocument = (email: string) => (dispatch, getState) => {
         return doc
       },
       error => {
-        var errorMessage = new Error(error.message)
+        const errorMessage = new Error(error.message)
         throw errorMessage
       }
     )
@@ -266,7 +266,7 @@ export const getDocument = (email: string) => (dispatch, getState) => {
         return doc
       },
       error => {
-        var errorMessage = new Error(error.message)
+        const errorMessage = new Error(error.message)
         throw errorMessage
       }
     )
@@ -290,14 +290,14 @@ export const getDocument = (email: string) => (dispatch, getState) => {
         }
       },
       error => {
-        var errorMessage = new Error(error.message)
+        const errorMessage = new Error(error.message)
         throw errorMessage
       }
     )
     .then(
       data => dispatch(ActionCreators.getDocumentFulfilled(data)),
       error => {
-        var errorMessage = new Error(error.message)
+        const errorMessage = new Error(error.message)
         throw errorMessage
       }
     )
@@ -411,7 +411,7 @@ export const mutateInput = (
         .then(
           () => dispatch(ActionCreators.mutateInputFulfilled(inputsArray)),
           error => {
-            var errorMessage = new Error(error.message)
+            const errorMessage = new Error(error.message)
             throw errorMessage
           }
         )
@@ -454,7 +454,7 @@ export const register = (creds: Credential) => (dispatch, getState) => {
         return userCredential
       },
       error => {
-        var errorMessage = new Error(error.message)
+        const errorMessage = new Error(error.message)
         throw errorMessage
       }
     )
@@ -464,7 +464,7 @@ export const register = (creds: Credential) => (dispatch, getState) => {
         return userCredential
       },
       error => {
-        var errorMessage = new Error(error.message)
+        const errorMessage = new Error(error.message)
         throw errorMessage
       }
     )
@@ -475,7 +475,7 @@ export const register = (creds: Credential) => (dispatch, getState) => {
         )
       ),
       error => {
-        var errorMessage = new Error(error.message)
+        const errorMessage = new Error(error.message)
         throw errorMessage
       }
     )
@@ -503,7 +503,7 @@ export const removeInput = (id: string) => (dispatch, getState) => {
     .then(
       () => dispatch(ActionCreators.removeInputsFulfilled(inputsArray)),
       error => {
-        var errorMessage = new Error(error.message)
+        const errorMessage = new Error(error.message)
         throw errorMessage
       }
     )
@@ -528,7 +528,7 @@ export const removeInputs = () => (dispatch, getState) => {
     .then(
       () => dispatch(ActionCreators.removeInputsFulfilled([])),
       error => {
-        var errorMessage = new Error(error.message)
+        const errorMessage = new Error(error.message)
         throw errorMessage
       }
     )
@@ -551,7 +551,7 @@ export const removeListeners = () => (dispatch, getState) => {
     .then(
       () => dispatch(ActionCreators.removeListenersFulfilled()),
       error => {
-        var errorMessage = new Error(error.message)
+        const errorMessage = new Error(error.message)
         throw errorMessage
       }
     )
@@ -572,7 +572,7 @@ export const removeTimers = () => (dispatch, getState) => {
     .then(
       () => dispatch(ActionCreators.removeTimersFulfilled()),
       error => {
-        var errorMessage = new Error(error.message)
+        const errorMessage = new Error(error.message)
         throw errorMessage
       }
     )
@@ -664,7 +664,7 @@ export const setListener = (
         return interval
       },
       error => {
-        var errorMessage = new Error(error.message)
+        const errorMessage = new Error(error.message)
         throw errorMessage
       }
     )
@@ -694,22 +694,22 @@ export const setListener = (
         }
       },
       error => {
-        var errorMessage = new Error(error.message)
+        const errorMessage = new Error(error.message)
         throw errorMessage
       }
     )
     .then(
       listener => exists(listener)
         ? dispatch(
-          ActionCreators.setListenerFulfilled(
-            getState().listener.listeners.concat(listener)
+            ActionCreators.setListenerFulfilled(
+              getState().listener.listeners.concat(listener)
+            )
           )
-        )
         : dispatch(
           ActionCreators.setListenerFulfilled(getState()().listener.listeners)
         ),
       error => {
-        var errorMessage = new Error(error.message)
+        const errorMessage = new Error(error.message)
         throw errorMessage
       }
     )
@@ -775,7 +775,7 @@ export const setListenerInterval = (
           return result
         },
         error => {
-          var errorMessage = new Error(error.message)
+          const errorMessage = new Error(error.message)
           throw errorMessage
         }
       )
@@ -789,7 +789,7 @@ export const setListenerInterval = (
           return result
         },
         error => {
-          var errorMessage = new Error(error.message)
+          const errorMessage = new Error(error.message)
           throw errorMessage
         }
       )
@@ -806,7 +806,7 @@ export const setListenerInterval = (
           return interval
         },
         error => {
-          var errorMessage = new Error(error.message)
+          const errorMessage = new Error(error.message)
           throw errorMessage
         }
       )
@@ -833,7 +833,7 @@ export const setShortestInterval = (
     .then(
       () => dispatch(ActionCreators.setShortestIntervalFulfilled(interval)),
       error => {
-        var errorMessage = new Error(error.message)
+        const errorMessage = new Error(error.message)
         throw errorMessage
       }
     )
@@ -859,7 +859,7 @@ export const setSnooze = (snooze: number) => (dispatch, getState) => {
     .then(
       () => dispatch(ActionCreators.setSnoozeFulfilled(snooze)),
       error => {
-        var errorMessage = new Error(error.message)
+        const errorMessage = new Error(error.message)
         throw errorMessage
       }
     )
@@ -907,7 +907,7 @@ export const setTimer = (isTest:boolean = false) => (dispatch, getState) => {
         return interval
       },
       error => {
-        var errorMessage = new Error(error.message)
+        const errorMessage = new Error(error.message)
         throw errorMessage
       }
     )
@@ -937,20 +937,20 @@ export const setTimer = (isTest:boolean = false) => (dispatch, getState) => {
         }
       },
       error => {
-        var errorMessage = new Error(error.message)
+        const errorMessage = new Error(error.message)
         throw errorMessage
       }
     )
     .then(
       timer => exists(timer)
         ? dispatch(
-          ActionCreators.setTimerFulfilled(
-            getState().timer.timers.concat(timer)
+            ActionCreators.setTimerFulfilled(
+              getState().timer.timers.concat(timer)
+            )
           )
-        )
         : dispatch(ActionCreators.setTimerFulfilled(getState().timer.timers)),
       error => {
-        var errorMessage = new Error(error.message)
+        const errorMessage = new Error(error.message)
         throw errorMessage
       }
     )
@@ -1012,7 +1012,7 @@ export const setTimerInterval = (
           return result
         },
         error => {
-          var errorMessage = new Error(error.message)
+          const errorMessage = new Error(error.message)
           throw errorMessage
         }
       )
@@ -1025,7 +1025,7 @@ export const setTimerInterval = (
           return result
         },
         error => {
-          var errorMessage = new Error(error.message)
+          const errorMessage = new Error(error.message)
           throw errorMessage
         }
       )
@@ -1064,7 +1064,7 @@ export const signIn = (
         return userCredential
       },
       error => {
-        var errorMessage = new Error(error.message)
+        const errorMessage = new Error(error.message)
         throw errorMessage
       }
     )
@@ -1078,7 +1078,7 @@ export const signIn = (
         }
       },
       error => {
-        var errorMessage = new Error(error.message)
+        const errorMessage = new Error(error.message)
         throw errorMessage
       }
     )
@@ -1089,7 +1089,7 @@ export const signIn = (
         )
       ),
       error => {
-        var errorMessage = new Error(error.message)
+        const errorMessage = new Error(error.message)
         throw errorMessage
       }
     )
@@ -1110,21 +1110,21 @@ export const signOut = () => (dispatch, getState) => {
     .then(
       () => dispatch(removeTimers()),
       error => {
-        var errorMessage = new Error(error.message)
+        const errorMessage = new Error(error.message)
         throw errorMessage
       }
     )
     .then(
       () => dispatch(removeListeners()),
       error => {
-        var errorMessage = new Error(error.message)
+        const errorMessage = new Error(error.message)
         throw errorMessage
       }
     )
     .then(
       () => dispatch(ActionCreators.signoutFulfilled()),
       error => {
-        var errorMessage = new Error(error.message)
+        const errorMessage = new Error(error.message)
         throw errorMessage
       }
     )
