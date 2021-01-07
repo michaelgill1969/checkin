@@ -115,7 +115,7 @@ describe(
     it(
       'updates buddy',
       async () => {
-        const store = mockStore({})
+        const store = mockStore(expectedState)
         const expectedAction = {
           type: ActionTypes.ADD_BUDDY_FULFILLED,
           email: email1
@@ -128,6 +128,7 @@ describe(
 
         await testDoc.set({ checkinTime: 'now' })
 
+	//TODO: You will need to sign in and get a UID from firebase in order to fix rejection when getting document.
         return store.dispatch(ActionThunks.addBuddy(email1, db))
           .then(
             () => {
