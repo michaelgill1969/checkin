@@ -85,6 +85,20 @@ function getFirestore (auth) {
 jest.mock('react-native/Libraries/EventEmitter/NativeEventEmitter')
 
 jest.mock(
+  '@react-native-firebase/auth',
+  () => {
+    const real = jest.requireActual('@react-native-firebase/auth')
+    return {
+      ...real,
+      auth: jest
+        .fn(
+          () => firebase.auth().useEmulator('http://localhost:9099/')
+        )
+    }
+  }
+)
+
+jest.mock(
   'redux-persist',
   () => {
     const real = jest.requireActual('redux-persist')
@@ -118,63 +132,24 @@ describe(
       'registers user',
       async () => {
         const store = mockStore(expectedState)
-	const expectedAction = {
-          type: ActionTypes.REGISTRATION_FULFILLED
-	}
-
-        const db = getFirestore(auth1)
-        const testCollection = db.collection('users')
-
-        return store.dispatch(ActionThunks.register({ username: email1, password: 'A1111111' }))
-          .then(
-            () => { 
-              const actions = store.getActions()
-              console.log(actions)
-
-              // TODO: Fails because the registration thunk needs 'auth()', not 'db()',  to create a user.
-              expect(actions).toContainEqual(expectedAction)
-              return null
-	    },
-            error => {
-              const errorMessage = new Error(error.message)
-              throw errorMessage
-	    }
-	  )
-          .catch(error => console.log(error.message))
-      }
-    )
-  }
-)
-
-describe(
-  'add-buddy thunk',
-  () => {
-    it(
-      'updates buddy',
-      async () => {
-        const store = mockStore(expectedState)
         const expectedAction = {
-          type: ActionTypes.ADD_BUDDY_FULFILLED,
-          email: email1
+          type: ActionTypes.REGISTRATION_FULFILLED
         }
 
-        // TODO: You can get this to work when you pass in the db to the thunks
-        // using an optional parameter.
-        const db = getFirestore(auth1)
-        const testDoc = db.collection('users').doc(email1)
+        // const db =
+        getFirestore(auth1)
+        // const testCollection = db.collection('users')
 
-        await testDoc.set({ checkinTime: 'now' })
-
-	//TODO: You will need to sign in and get a UID from firebase in order to fix rejection when getting document.
-        return store.dispatch(ActionThunks.addBuddy(email1, db))
+        return store.dispatch(
+          ActionThunks.register({ username: email1, password: 'A1111111' })
+        )
           .then(
             () => {
               const actions = store.getActions()
               console.log(actions)
-              // Actions return incude a couple rejections.
-              // They happen because they can't get the state.
-              // Do you need to mock the state?
-              // TODO: Assertion should fail if any action is a rejection.
+
+              // TODO: Fails because the registration thunk needs 'auth()', not
+              // 'db()',  to create a user.
               expect(actions).toContainEqual(expectedAction)
               return null
             },
@@ -184,30 +159,74 @@ describe(
             }
           )
           .catch(error => console.log(error.message))
-
-        // expect(
-        //   {
-        //     ...initialState
-        //   }
-        // ).toEqual(
-        //   {
-        //     ...expectedState,
-        //     buddy: {
-        //       alertTimes: [],
-        //       checkinInterval: null,
-        //       checkinTime: '',
-        //       email: email1,
-        //       errorMessage: '',
-        //       isAdded: null,
-        //       lastAlertTime: '',
-        //       snooze: 9
-        //     }
-        //   }
-        // )
       }
     )
   }
 )
+
+// describe(
+//   'add-buddy thunk',
+//   () => {
+//     it(
+//       'updates buddy',
+//       async () => {
+//         const store = mockStore(expectedState)
+//         const expectedAction = {
+//           type: ActionTypes.ADD_BUDDY_FULFILLED,
+//           email: email1
+//         }
+//
+//         // TODO: You can get this to work when you pass in the db to the thunks
+//         // using an optional parameter.
+//         const db = getFirestore(auth1)
+//         const testDoc = db.collection('users').doc(email1)
+//
+//         await testDoc.set({ checkinTime: 'now' })
+//
+//         // TODO: You will need to sign in and get a UID from firebase in order
+//         // to fix rejection when getting document.
+//         return store.dispatch(ActionThunks.addBuddy(email1, db))
+//           .then(
+//             () => {
+//               const actions = store.getActions()
+//               console.log(actions)
+//               // Actions return incude a couple rejections.
+//               // They happen because they can't get the state.
+//               // Do you need to mock the state?
+//               // TODO: Assertion should fail if any action is a rejection.
+//               expect(actions).toContainEqual(expectedAction)
+//               return null
+//             },
+//             error => {
+//               const errorMessage = new Error(error.message)
+//               throw errorMessage
+//             }
+//           )
+//           .catch(error => console.log(error.message))
+//
+//         // expect(
+//         //   {
+//         //     ...initialState
+//         //   }
+//         // ).toEqual(
+//         //   {
+//         //     ...expectedState,
+//         //     buddy: {
+//         //       alertTimes: [],
+//         //       checkinInterval: null,
+//         //       checkinTime: '',
+//         //       email: email1,
+//         //       errorMessage: '',
+//         //       isAdded: null,
+//         //       lastAlertTime: '',
+//         //       snooze: 9
+//         //     }
+//         //   }
+//         // )
+//       }
+//     )
+//   }
+// )
 
 // describe(
 //   'add-document thunk',
@@ -215,7 +234,8 @@ describe(
 //     // const user = {
 //     //   checkinTime: (new Date()).toISOString(),
 //     //   isSignedIn: true,
-//     //   snooze: 9 // TODO: This should be changed so snooze is not reset on login.
+//     //   // TODO: This should be changed so snooze is not reset on login.
+//     //   snooze: 9
 //     // }
 //
 //     it(
