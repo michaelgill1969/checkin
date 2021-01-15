@@ -70,11 +70,11 @@ const expectedState = {
   }
 }
 
-function getFirestore (auth) {
-  return firebase
-    .initializeTestApp({ projectId: PROJECT_ID, auth: auth })
-    .firestore()
-}
+// function getFirestore (auth) {
+//   return firebase
+//     .initializeTestApp({ projectId: PROJECT_ID, auth: auth })
+//     .firestore()
+// }
 
 // beforeEach(
 //   async () => await firebase.clearFirestoreData({ projectId: PROJECT_ID })
@@ -136,9 +136,7 @@ describe(
           type: ActionTypes.REGISTRATION_FULFILLED
         }
 
-        // const db =
-        getFirestore(auth1)
-        // const testCollection = db.collection('users')
+        firebase.initializeTestApp({ projectId: PROJECT_ID, auth: auth1 })
 
         return store.dispatch(
           ActionThunks.register({ username: email1, password: 'A1111111' })
