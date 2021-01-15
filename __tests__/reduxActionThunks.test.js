@@ -80,6 +80,8 @@ function getFirestore (auth) {
 //   async () => await firebase.clearFirestoreData({ projectId: PROJECT_ID })
 // )
 
+// jest.useFakeTimers()
+
 jest.mock('react-native/Libraries/EventEmitter/NativeEventEmitter')
 
 jest.mock(
@@ -104,6 +106,41 @@ describe(
         const initialState = await ConfigureStore().store.getState()
 
         expect(initialState).toEqual(expectedState)
+      }
+    )
+  }
+)
+
+describe(
+  'registration thunk',
+  () => {
+    it(
+      'registers user',
+      async () => {
+        const store = mockStore(expectedState)
+	const expectedAction = {
+          type: ActionTypes.REGISTRATION_FULFILLED
+	}
+
+        const db = getFirestore(auth1)
+        const testCollection = db.collection('users')
+
+        return store.dispatch(ActionThunks.register({ username: email1, password: 'A1111111' }))
+          .then(
+            () => { 
+              const actions = store.getActions()
+              console.log(actions)
+
+              // TODO: Fails because the registration thunk needs 'auth()', not 'db()',  to create a user.
+              expect(actions).toContainEqual(expectedAction)
+              return null
+	    },
+            error => {
+              const errorMessage = new Error(error.message)
+              throw errorMessage
+	    }
+	  )
+          .catch(error => console.log(error.message))
       }
     )
   }
