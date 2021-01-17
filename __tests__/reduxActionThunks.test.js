@@ -70,11 +70,11 @@ const expectedState = {
   }
 }
 
-// function getFirestore (auth) {
-//   return firebase
-//     .initializeTestApp({ projectId: PROJECT_ID, auth: auth })
-//     .firestore()
-// }
+function getFirestore (auth) {
+  return firebase
+    .initializeTestApp({ projectId: PROJECT_ID, auth: auth })
+    .firestore()
+}
 
 // beforeEach(
 //   async () => await firebase.clearFirestoreData({ projectId: PROJECT_ID })
@@ -84,19 +84,19 @@ const expectedState = {
 
 jest.mock('react-native/Libraries/EventEmitter/NativeEventEmitter')
 
-jest.mock(
-  '@react-native-firebase/auth',
-  () => {
-    const real = jest.requireActual('@react-native-firebase/auth')
-    return {
-      ...real,
-      auth: jest
-        .fn(
-          () => firebase.auth().useEmulator('http://localhost:9099/')
-        )
-    }
-  }
-)
+// jest.mock(
+//   '@react-native-firebase/auth',
+//   () => {
+//     const real = jest.requireActual('@react-native-firebase/auth')
+//     return {
+//       ...real,
+//       auth: jest
+//         .fn(
+//           () => firebase.auth().useEmulator('http://localhost:9099/')
+//         )
+//     }
+//   }
+// )
 
 jest.mock(
   'redux-persist',
@@ -136,7 +136,11 @@ describe(
           type: ActionTypes.REGISTRATION_FULFILLED
         }
 
-        firebase.initializeTestApp({ projectId: PROJECT_ID, auth: auth1 })
+        // firebase.initializeTestApp({ projectId: PROJECT_ID, auth: auth1 })
+        const now = (new Date()).toISOString()
+        const db = getFirestore(auth1)
+        const testDoc = db.collection('users').doc(email1)
+        testDoc.set({ checkinTime: now })
 
         return store.dispatch(
           ActionThunks.register({ username: email1, password: 'A1111111' })
@@ -176,10 +180,11 @@ describe(
 //
 //         // TODO: You can get this to work when you pass in the db to the thunks
 //         // using an optional parameter.
+//         const now = (new Date()).toISOString()
 //         const db = getFirestore(auth1)
 //         const testDoc = db.collection('users').doc(email1)
 //
-//         await testDoc.set({ checkinTime: 'now' })
+//         await testDoc.set({ checkinTime: now })
 //
 //         // TODO: You will need to sign in and get a UID from firebase in order
 //         // to fix rejection when getting document.
