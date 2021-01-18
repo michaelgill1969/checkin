@@ -130,53 +130,23 @@ describe(
   () => {
     it(
       'registers user',
-      async () => {
+      () => {
         const store = mockStore(expectedState)
         const expectedAction = {
           type: ActionTypes.REGISTRATION_FULFILLED
         }
 
-        return Promise.resolve(
-          firebase.initializeTestApp(
-            { projectId: PROJECT_ID }
-          )
-        )
-          .then(
-            () => {
-              // firebase.auth().useEmulator('http://localhost:9099/')
-              console.log(firebase)
-              return null
-            },
-            error => {
-              const errorMessage = new Error(error.message)
-              throw errorMessage
-            }
-          )
-          // .then(
-          //   () => store.dispatch(
-          //     ActionThunks.register({ username: email1, password: 'A1111111' })
-          //   ),
-          //   error => {
-          //     const errorMessage = new Error(error.message)
-          //     throw errorMessage
-          //   }
-          // )
-          .then(
-            () => {
-              const actions = store.getActions()
-              console.log(actions)
+	const fb = firebase.initializeTestApp({ projectId: PROJECT_ID })
+        // firebase.auth().useEmulator('http://localhost:9099/')
+        console.log(fb)
+        // store.dispatch(
+        // ActionThunks.register({ username: email1, password: 'A1111111' })
+        const actions = store.getActions()
+        console.log(actions)
 
-              // TODO: Fails because the registration thunk needs 'auth()', not
-              // 'db()',  to create a user.
-              expect(actions).toContainEqual(expectedAction)
-              return null
-            },
-            error => {
-              const errorMessage = new Error(error.message)
-              throw errorMessage
-            }
-          )
-          .catch(error => console.log(error.message))
+        // TODO: Fails because the registration thunk needs 'auth()', not
+        // 'db()',  to create a user.
+        expect(actions).toEqual([expectedAction])
       }
     )
   }
