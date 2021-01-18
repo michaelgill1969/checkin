@@ -136,15 +136,31 @@ describe(
           type: ActionTypes.REGISTRATION_FULFILLED
         }
 
-        firebase.initializeTestApp({ projectId: PROJECT_ID, auth: auth1 })
-        // const now = (new Date()).toISOString()
-        // const db = getFirestore(auth1)
-        // const testDoc = db.collection('users').doc(email1)
-        // testDoc.set({ checkinTime: now })
-
-        return store.dispatch(
-          ActionThunks.register({ username: email1, password: 'A1111111' })
+        return Promise.resolve(
+          firebase.initializeTestApp(
+            { projectId: PROJECT_ID }
+          )
         )
+          .then(
+            () => {
+              // firebase.auth().useEmulator('http://localhost:9099/')
+              console.log(firebase)
+              return null
+            },
+            error => {
+              const errorMessage = new Error(error.message)
+              throw errorMessage
+            }
+          )
+          // .then(
+          //   () => store.dispatch(
+          //     ActionThunks.register({ username: email1, password: 'A1111111' })
+          //   ),
+          //   error => {
+          //     const errorMessage = new Error(error.message)
+          //     throw errorMessage
+          //   }
+          // )
           .then(
             () => {
               const actions = store.getActions()
