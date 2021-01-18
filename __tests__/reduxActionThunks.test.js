@@ -70,11 +70,11 @@ const expectedState = {
   }
 }
 
-function getFirestore (auth) {
-  return firebase
-    .initializeTestApp({ projectId: PROJECT_ID, auth: auth })
-    .firestore()
-}
+// function getFirestore (auth) {
+//   return firebase
+//     .initializeTestApp({ projectId: PROJECT_ID, auth: auth })
+//     .firestore()
+// }
 
 // beforeEach(
 //   async () => await firebase.clearFirestoreData({ projectId: PROJECT_ID })
