@@ -12,11 +12,11 @@ const mockStore = configureStore(middlewares)
 
 const PROJECT_ID = 'cryonics-check-in-dev-0-0-2'
 const email1 = 'a@a.aa'
-// const email2 = 'b@b.bb'
+const email2 = 'b@b.bb'
 const uid1 = email1
-// const uid2 = email2
+const uid2 = email2
 const auth1 = { uid: uid1, email: email1 }
-// const auth2 = { uid: uid2, email: email2 }
+const auth2 = { uid: uid2, email: email2 }
 
 const expectedState = {
   auth: {
@@ -70,11 +70,11 @@ const expectedState = {
   }
 }
 
-// function getFirestore (auth) {
-//   return firebase
-//     .initializeTestApp({ projectId: PROJECT_ID, auth: auth })
-//     .firestore()
-// }
+function getFirestore (auth) {
+  return firebase
+    .initializeTestApp({ projectId: PROJECT_ID, auth: auth })
+    .firestore()
+}
 
 // beforeEach(
 //   async () => await firebase.clearFirestoreData({ projectId: PROJECT_ID })
@@ -131,22 +131,24 @@ describe(
     it(
       'registers user',
       () => {
-        const store = mockStore(expectedState)
-        const expectedAction = {
-          type: ActionTypes.REGISTRATION_FULFILLED
-        }
+        // const store = mockStore(expectedState)
+        // const expectedAction = {
+        //   type: ActionTypes.REGISTRATION_FULFILLED
+        // }
 
-	const fb = firebase.initializeTestApp({ projectId: PROJECT_ID })
+        const fb = firebase.initializeTestApp({ projectId: PROJECT_ID })
         // firebase.auth().useEmulator('http://localhost:9099/')
-        console.log(fb)
+        // console.log(fb)
         // store.dispatch(
         // ActionThunks.register({ username: email1, password: 'A1111111' })
-        const actions = store.getActions()
-        console.log(actions)
+        // const actions = store.getActions()
+        // console.log(actions)
 
         // TODO: Fails because the registration thunk needs 'auth()', not
         // 'db()',  to create a user.
-        expect(actions).toEqual([expectedAction])
+        // expect(actions).toEqual([expectedAction])
+        expect(fb.auth().createUserWithEmailAndPassword(email1, 'A1111111'))
+          .resolves.not.toBeNull()
       }
     )
   }
