@@ -7,6 +7,23 @@ import * as ActionThunks from '../redux/ActionThunks'
 import * as ActionTypes from '../redux/ActionTypes'
 import { ConfigureStore } from '../redux/configureStore'
 
+jest.mock('@react-native-firebase/auth')
+
+jest.mock('react-native/Libraries/EventEmitter/NativeEventEmitter')
+
+jest.mock(
+  'redux-persist',
+  () => {
+    return {
+      ...jest.requireActual('redux-persist'),
+      persistReducer: jest.fn()
+        .mockImplementation((config, reducers) => reducers)
+    }
+  }
+)
+
+// jest.useFakeTimers()
+
 const middlewares = [thunk]
 const mockStore = configureStore(middlewares)
 
@@ -87,23 +104,6 @@ function getFirestore (auth) {
 //   async () => await firebase.clearFirestoreData({ projectId: PROJECT_ID })
 // )
 
-// jest.useFakeTimers()
-
-jest.mock('@react-native-firebase/auth')
-
-jest.mock('react-native/Libraries/EventEmitter/NativeEventEmitter')
-
-jest.mock(
-  'redux-persist',
-  () => {
-    return {
-      ...jest.requireActual('redux-persist'),
-      persistReducer: jest.fn()
-        .mockImplementation((config, reducers) => reducers)
-    }
-  }
-)
-
 describe(
   'redux store',
   () => {
@@ -135,11 +135,13 @@ describe(
       }
     )
 
+    const firestore = getFirestore(auth1)
+
     it(
       'creates firestore',
       async () => {
         firebase.assertSucceeds(
-          await getFirestore(auth1)
+          await firestore
             .collection('users')
             .doc(email1)
             .set({ foo: 'bar' })
@@ -165,7 +167,7 @@ describe(
           ActionThunks.register({ username: email1, password: password1 })
         )
         const actions = store.getActions()
-        console.log(actions)
+        // console.log(actions)
 
         expect(actions).toContainEqual(expectedAction)
       }
