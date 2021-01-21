@@ -1,4 +1,4 @@
-// import auth from '@react-native-firebase/auth'
+import auth from '@react-native-firebase/auth'
 // import db from '@react-native-firebase/firestore'
 import * as firebase from '@firebase/testing'
 import configureStore from 'redux-mock-store'
@@ -13,6 +13,8 @@ const mockStore = configureStore(middlewares)
 const PROJECT_ID = 'cryonics-check-in-dev-0-0-2'
 const email1 = 'a@a.aa'
 const email2 = 'b@b.bb'
+const password1 = 'A1111111'
+const password2 = 'B1111111'
 const uid1 = email1
 const uid2 = email2
 const auth1 = { uid: uid1, email: email1 }
@@ -76,36 +78,27 @@ function getFirestore (auth) {
     .firestore()
 }
 
+// function getAdminApp () {
+//   return firebase
+//     .initializeAdminApp({ projectId: PROJECT_ID })
+// }
+
 // beforeEach(
 //   async () => await firebase.clearFirestoreData({ projectId: PROJECT_ID })
 // )
 
 // jest.useFakeTimers()
 
-jest.mock('react-native/Libraries/EventEmitter/NativeEventEmitter')
+jest.mock('@react-native-firebase/auth')
 
-// jest.mock(
-//   '@react-native-firebase/auth',
-//   () => {
-//     const real = jest.requireActual('@react-native-firebase/auth')
-//     return {
-//       ...real,
-//       auth: jest
-//         .fn(
-//           () => firebase.auth().useEmulator('http://localhost:9099/')
-//         )
-//     }
-//   }
-// )
+jest.mock('react-native/Libraries/EventEmitter/NativeEventEmitter')
 
 jest.mock(
   'redux-persist',
   () => {
-    const real = jest.requireActual('redux-persist')
     return {
-      ...real,
-      persistReducer: jest
-        .fn()
+      ...jest.requireActual('redux-persist'),
+      persistReducer: jest.fn()
         .mockImplementation((config, reducers) => reducers)
     }
   }
@@ -126,29 +119,55 @@ describe(
 )
 
 describe(
+  'firebase',
+  () => {
+    it(
+      'creates user',
+      async () => {
+        expect(await auth.createUserWithEmailAndPassword(email1, password1))
+          .toStrictEqual(
+            {
+              user: {
+                email: email1
+              }
+            }
+          )
+      }
+    )
+
+    it(
+      'creates firestore',
+      async () => {
+        firebase.assertSucceeds(
+          await getFirestore(auth1)
+            .collection('users')
+            .doc(email1)
+            .set({ foo: 'bar' })
+        )
+      }
+    )
+  }
+)
+
+describe(
   'registration thunk',
   () => {
     it(
       'registers user',
-      () => {
-        // const store = mockStore(expectedState)
-        // const expectedAction = {
-        //   type: ActionTypes.REGISTRATION_FULFILLED
-        // }
+      async () => {
+        const store = mockStore(expectedState)
+        const expectedAction = {
+          type: ActionTypes.REGISTRATION_REQUESTED
+        }
 
-        const fb = firebase.initializeTestApp({ projectId: PROJECT_ID })
-        // firebase.auth().useEmulator('http://localhost:9099/')
-        // console.log(fb)
-        // store.dispatch(
-        // ActionThunks.register({ username: email1, password: 'A1111111' })
-        // const actions = store.getActions()
-        // console.log(actions)
+        // TODO: Try adding a test store.
+        await store.dispatch(
+          ActionThunks.register({ username: email1, password: password1 })
+        )
+        const actions = store.getActions()
+        console.log(actions)
 
-        // TODO: Fails because the registration thunk needs 'auth()', not
-        // 'db()',  to create a user.
-        // expect(actions).toEqual([expectedAction])
-        expect(fb.auth().createUserWithEmailAndPassword(email1, 'A1111111'))
-          .resolves.not.toBeNull()
+        expect(actions).toContainEqual(expectedAction)
       }
     )
   }
@@ -306,7 +325,7 @@ describe(
 //         const testDoc = db.collection('users').doc(email1)
 //         // await testDoc.set({ checkinTime: now })
 //
-//         await ActionThunks.signIn({ username: email1, password: 'A1111111' })
+//         await ActionThunks.signIn({ username: email1, password: password1 })
 //         await ActionThunks.addDocument(email1)
 //
 //         // await testDoc.get().then(doc => console.log(doc))

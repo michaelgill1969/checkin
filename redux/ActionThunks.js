@@ -453,7 +453,8 @@ export const mutateInput = (
 export const register = (creds: Credential) => (dispatch, getState) => {
   dispatch(ActionCreators.registrationRequested())
 
-  return auth().createUserWithEmailAndPassword(creds.username, creds.password)
+  // console.log(auth)
+  return auth.createUserWithEmailAndPassword(creds.username, creds.password)
     .then(
       userCredential => {
         dispatch(addDocument(userCredential.user.email))
