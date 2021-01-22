@@ -6,8 +6,8 @@ service cloud.firestore {
     // available in rules.
     match /users/{email} {
       // allow read, write: if request.auth.uid != null;
-      allow delete: if request.auth.token.email == email;
-      allow create, read, update: if request.auth.uid != null;
+      allow create: if request.auth.uid != null;
+      allow delete, read, update: if request.auth.token.email == email;
     }
   }
 }

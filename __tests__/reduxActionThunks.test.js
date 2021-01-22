@@ -118,36 +118,17 @@ describe(
   }
 )
 
-describe(
-  'firebase',
-  () => {
-    it(
-      'creates user',
-      async () => {
-        expect(await auth.createUserWithEmailAndPassword(email1, password1))
-          .toStrictEqual(
-            {
-              user: {
-                email: email1
-              }
-            }
-          )
-      }
-    )
-
-    const firestore = getFirestore(auth1)
-
-    it(
-      'creates firestore',
-      async () => {
-        firebase.assertSucceeds(
-          await firestore
-            .collection('users')
-            .doc(email1)
-            .set({ foo: 'bar' })
-        )
-      }
-    )
+it(
+  'allow user creation',
+  async () => {
+    await expect(auth.createUserWithEmailAndPassword(email1, password1))
+      .resolves.toStrictEqual(
+        {
+          user: {
+            email: email1
+          }
+        }
+      )
   }
 )
 
