@@ -1,7 +1,6 @@
 import * as firebase from '@firebase/testing'
 
 jest.mock('@react-native-firebase/auth')
-
 jest.mock('react-native/Libraries/EventEmitter/NativeEventEmitter')
 
 const PROJECT_ID = 'cryonics-check-in-dev-0-0-2'
@@ -19,14 +18,14 @@ function getFirestore (auth) {
 }
 
 describe(
-  'security rules',
+  'firebase',
   () => {
     const firestoreWithoutAuthorization = getFirestore(null)
     const firestoreForUser1 = getFirestore(auth1)
     const firestoreForUser2 = getFirestore(auth2)
 
     it(
-      'do not allow creation of document in firestore without authorized user',
+      'does not allow creation of document in firestore without authorized user',
       async () => {
         await firebase.assertFails(
           firestoreWithoutAuthorization
@@ -38,7 +37,7 @@ describe(
     )
 
     it(
-      'allow creation of document in firestore for first authorized user',
+      'allows creation of document in firestore for first authorized user',
       async () => {
         await firebase.assertSucceeds(
           firestoreForUser1
@@ -50,7 +49,55 @@ describe(
     )
 
     it(
-      'allow creation of document in firestore for second authorized user',
+      'allows first user\'s document to be read by first user',
+      async () => {
+        await firebase.assertSucceeds(
+          firestoreForUser1
+            .collection('users')
+            .doc(email1)
+            .get()
+          )
+      }
+    )
+
+    it(
+      'allows first user\'s document to be updated by first user',
+      async () => {
+        await firebase.assertSucceeds(
+          firestoreForUser1
+            .collection('users')
+            .doc(email1)
+            .update({ foo: 'baz' })
+        )
+      }
+    )
+
+    it(
+      'allows first user\'s document to be written by first user',
+      async () => {
+        await firebase.assertSucceeds(
+          firestoreForUser1
+            .collection('users')
+            .doc(email1)
+            .set({ bar: 'foo' })
+        )
+      }
+    )
+
+    it(
+      'allows first user\'s document to be deleted by first user',
+      async () => {
+        await firebase.assertSucceeds(
+          firestoreForUser1
+            .collection('users')
+            .doc(email1)
+            .delete()
+        )
+      }
+    )
+    
+    it(
+      'allows creation of document in firestore for second authorized user',
       async () => {
         await firebase.assertSucceeds(
           firestoreForUser2
@@ -62,13 +109,37 @@ describe(
     )
 
     it(
-      'allow first user\'s document to be deleted by first user',
+      'does not allow second user\'s document to be read by first user',
       async () => {
-        await firebase.assertSucceeds(
+        await firebase.assertFails(
           firestoreForUser1
             .collection('users')
-            .doc(email1)
-            .delete()
+            .doc(email2)
+            .get()
+        )
+      }
+    )
+
+    it(
+      'does not allow second user\'s document to be updated by first user',
+      async () => {
+        await firebase.assertFails(
+          firestoreForUser1
+            .collection('users')
+            .doc(email2)
+            .update({ foo: 'baz' })
+        )
+      }
+    )
+
+    it(
+      'does not allow second user\'s document to be written by first user',
+      async () => {
+        await firebase.assertFails(
+          firestoreForUser1
+            .collection('users')
+            .doc(email2)
+            .set({ bar: 'foo' })
         )
       }
     )
@@ -86,7 +157,7 @@ describe(
     )
 
     it(
-      'allow second user\'s document to be deleted by second user',
+      'allows second user\'s document to be deleted by second user',
       async () => {
         await firebase.assertSucceeds(
           firestoreForUser1
@@ -99,4 +170,3 @@ describe(
   }
 )
 
-// TODO: Write tests for reading and updating.

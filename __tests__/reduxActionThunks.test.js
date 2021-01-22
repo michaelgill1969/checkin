@@ -8,9 +8,7 @@ import * as ActionTypes from '../redux/ActionTypes'
 import { ConfigureStore } from '../redux/configureStore'
 
 jest.mock('@react-native-firebase/auth')
-
 jest.mock('react-native/Libraries/EventEmitter/NativeEventEmitter')
-
 jest.mock(
   'redux-persist',
   () => {
@@ -118,17 +116,22 @@ describe(
   }
 )
 
-it(
-  'allow user creation',
-  async () => {
-    await expect(auth.createUserWithEmailAndPassword(email1, password1))
-      .resolves.toStrictEqual(
-        {
-          user: {
-            email: email1
-          }
-        }
-      )
+describe(
+  'firebase',
+  () => {
+    it(
+      'allows user creation',
+      async () => {
+        await expect(auth.createUserWithEmailAndPassword(email1, password1))
+          .resolves.toStrictEqual(
+            {
+              user: {
+                email: email1
+              }
+            }
+          )
+      }
+    )
   }
 )
 
