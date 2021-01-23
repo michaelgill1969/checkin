@@ -3,7 +3,7 @@ import * as firebase from '@firebase/testing'
 jest.mock('@react-native-firebase/auth')
 jest.mock('react-native/Libraries/EventEmitter/NativeEventEmitter')
 
-const PROJECT_ID = 'cryonics-check-in-dev-0-0-2'
+const PROJECT_ID = 'cryonics-check-in-test'
 const email1 = 'a@a.aa'
 const email2 = 'b@b.bb'
 const uid1 = email1
@@ -160,9 +160,9 @@ describe(
       'allows second user\'s document to be deleted by second user',
       async () => {
         await firebase.assertSucceeds(
-          firestoreForUser1
+          firestoreForUser2
             .collection('users')
-            .doc(email1)
+            .doc(email2)
             .delete()
         )
       }
