@@ -56,7 +56,7 @@ describe(
             .collection('users')
             .doc(email1)
             .get()
-          )
+        )
       }
     )
 
@@ -95,7 +95,7 @@ describe(
         )
       }
     )
-    
+
     it(
       'allows creation of document in firestore for second authorized user',
       async () => {
@@ -169,4 +169,3 @@ describe(
     )
   }
 )
-
