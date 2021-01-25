@@ -1,10 +1,11 @@
 import auth from '@react-native-firebase/auth'
-import * as firebase from '@firebase/testing'
+// import * as firebase from '@firebase/testing'
 import * as ActionCreators from '../redux/ActionCreators'
 import * as ActionThunks from '../redux/ActionThunks'
 import { ConfigureStore } from '../redux/configureStore'
 
 jest.mock('@react-native-firebase/auth')
+jest.mock('@react-native-firebase/firestore')
 jest.mock('react-native/Libraries/EventEmitter/NativeEventEmitter')
 jest.mock(
   'redux-persist',
@@ -71,7 +72,7 @@ const expectedState = {
   }
 }
 
-const PROJECT_ID = 'cryonics-check-in-dev-0-0-2'
+// const PROJECT_ID = 'cryonics-check-in-dev-0-0-2'
 const email1 = 'a@a.aa'
 // const email2 = 'b@b.bb'
 const password1 = 'A1111111'
@@ -87,9 +88,9 @@ const password1 = 'A1111111'
 //     .firestore()
 // }
 
-beforeEach(
-  async () => await firebase.clearFirestoreData({ projectId: PROJECT_ID })
-)
+// beforeEach(
+//   async () => await firebase.clearFirestoreData({ projectId: PROJECT_ID })
+// )
 
 describe(
   'redux store',
@@ -142,7 +143,7 @@ describe(
               // console.log(store.getState())
               expect(spy1).toHaveBeenCalled()
               expect(spy2).toHaveBeenCalledWith(
-                { creds: credentials, user: { email: 'email1' } }
+                { creds: credentials, user: { email: email1 } }
               )
               return null
             },
