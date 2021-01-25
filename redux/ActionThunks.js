@@ -77,8 +77,15 @@ export const addDocument = (email: string) => (dispatch, getState) => {
   //   snooze: 9 // TODO: This should be changed so snooze is not reset on login.
   // }
 
-  // console.log(db.collection('users').doc(email).set({ foo: 'bar' }))
+  console.log(db.collection())
+  // return db().collection('users').doc(email).get()
+  //   .then(
+  //     doc => {
+  //       console.log(doc)
   dispatch(ActionCreators.addDocumentRequested())
+  //     }
+  //   )
+  //   .catch(error => dispatch(ActionCreators.addDocumentRejected(error.message)))
 
   // TODO: How do you mock this?
   // return db().collection('users').doc(email).get()
