@@ -19,19 +19,19 @@
 import firestore from '@react-native-firebase/firestore'
 
 jest.mock(
-  '@react-native-firebase/firestore',
-  () => {
-    collection: jest.fn().mockReturnValue(
-      {
-        doc: jest.fn().mockReturnValue(
-          {
-            get: jest.fn().mockResolvedValue(
-              { foo: 'bar' }
-            )
-          }
-        )
-      }
-    )
-  }
+  '@react-native-firebase/firestore' // ,
+  //() => {
+  //  collection: jest.fn().mockReturnValue(
+  //    {
+  //      doc: jest.fn().mockReturnValue(
+  //        {
+  //          get: jest.fn().mockResolvedValue(
+  //            { foo: 'bar' }
+  //          )
+  //        }
+  //      )
+  //    }
+  //  )
+  //}
 )
 

@@ -77,7 +77,7 @@ export const addDocument = (email: string) => (dispatch, getState) => {
   //   snooze: 9 // TODO: This should be changed so snooze is not reset on login.
   // }
 
-  console.log(db.collection())
+  console.log(db)
   // return db().collection('users').doc(email).get()
   //   .then(
   //     doc => {

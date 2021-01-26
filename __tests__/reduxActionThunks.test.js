@@ -131,21 +131,21 @@ describe(
   () => {
     it(
       'registers user',
-      async () => {
+      () => {
         const spy1 = jest.spyOn(ActionCreators, 'addDocumentRequested')
         const spy2 = jest.spyOn(ActionCreators, 'registrationFulfilled')
         const credentials = { username: email1, password: password1 }
         const store = ConfigureStore().store
 
-        await store.dispatch(ActionThunks.register(credentials))
+        return store.dispatch(ActionThunks.register(credentials))
           .then(
             () => {
               // console.log(store.getState())
-              //expect(spy1).toHaveBeenCalled()
-              //expect(spy2).toHaveBeenCalledWith(
-                //{ creds: credentials, user: { email: email1 } }
-              //)
-              return null
+              expect(spy1).toHaveBeenCalled()
+              // expect(spy2).toHaveBeenCalledWith(
+              //   { creds: credentials, user: { email: email1 } }
+              // )
+              // return null
             },
             error => {
               const errorMessage = new Error(error.message)
