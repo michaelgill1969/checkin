@@ -1,11 +1,10 @@
 import auth from '@react-native-firebase/auth'
-// import * as firebase from '@firebase/testing'
 import * as ActionCreators from '../redux/ActionCreators'
 import * as ActionThunks from '../redux/ActionThunks'
 import { ConfigureStore } from '../redux/configureStore'
 
-//jest.mock('@react-native-firebase/auth')
-//jest.mock('@react-native-firebase/firestore')
+// jest.mock('@react-native-firebase/auth')
+// jest.mock('@react-native-firebase/firestore')
 jest.mock('react-native/Libraries/EventEmitter/NativeEventEmitter')
 jest.mock(
   'redux-persist',
@@ -125,15 +124,15 @@ describe(
   }
 )
 
-// TODO: Looks good, but the test Firestore probably needs to be moved here.
 describe(
   'registration thunk',
   () => {
     it(
       'registers user',
       () => {
-        const spy1 = jest.spyOn(ActionCreators, 'addDocumentRequested')
+        const spy1 = jest.spyOn(auth, 'createUserWithEmailAndPassword')
         const spy2 = jest.spyOn(ActionCreators, 'registrationFulfilled')
+        // const spy3 = jest.spyOn(ActionCreators, 'addDocumentRequested')
         const credentials = { username: email1, password: password1 }
         const store = ConfigureStore().store
 
@@ -142,10 +141,11 @@ describe(
             () => {
               // console.log(store.getState())
               expect(spy1).toHaveBeenCalled()
-              // expect(spy2).toHaveBeenCalledWith(
+              expect(spy2).toHaveBeenCalled()
+              // expect(spy3).toHaveBeenCalledWith(
               //   { creds: credentials, user: { email: email1 } }
               // )
-              // return null
+              return null
             },
             error => {
               const errorMessage = new Error(error.message)

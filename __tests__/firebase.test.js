@@ -1,8 +1,5 @@
 import * as firebase from '@firebase/testing'
 
-jest.mock('@react-native-firebase/auth')
-jest.mock('react-native/Libraries/EventEmitter/NativeEventEmitter')
-
 const PROJECT_ID = 'cryonics-check-in-test'
 const email1 = 'a@a.aa'
 const email2 = 'b@b.bb'

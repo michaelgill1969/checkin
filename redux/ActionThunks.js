@@ -457,17 +457,17 @@ export const mutateInput = (
 export const register = (creds: Credential) => (dispatch, getState) => {
   dispatch(ActionCreators.registrationRequested())
 
-  return auth.createUserWithEmailAndPassword(creds.username, creds.password)
-    .then(
-      userCredential => {
-        dispatch(addDocument(userCredential.user.email))
-        return userCredential
-      },
-      error => {
-        const errorMessage = new Error(error.message)
-        throw errorMessage
-      }
-    )
+  return auth().createUserWithEmailAndPassword(creds.username, creds.password)
+    // .then(
+    //   userCredential => {
+    //     dispatch(addDocument(userCredential.user.email))
+    //     return userCredential
+    //   },
+    //   error => {
+    //     const errorMessage = new Error(error.message)
+    //     throw errorMessage
+    //   }
+    // )
     // .then(
     //   userCredential => {
     //     dispatch(checkin())

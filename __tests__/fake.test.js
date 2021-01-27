@@ -1,3 +1,6 @@
+import db from '@react-native-firebase/firestore'
+
+jest.mock('react-native/Libraries/EventEmitter/NativeEventEmitter')
 jest.mock(
   '@react-native-firebase/firestore',
   () => {
@@ -21,5 +24,19 @@ jest.mock(
         }
       )
     }
+  }
+)
+
+describe(
+  'firestore object',
+  () => {
+    it(
+      'logs',
+      () => {
+        console.log(db.collection('users').doc('a@a.aa').get())
+
+        expect(true).toBeTruthy()
+      }
+    )
   }
 )
