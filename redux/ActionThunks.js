@@ -30,6 +30,16 @@ import * as ActionCreators from './ActionCreators'
 type AlertTimes = Array<{| id: string, time: string, validity: boolean |}>
 type Credential = {| username: string, password: string |}
 
+let firebase
+let firestore
+if (process.env.NODE_ENV === 'test') {
+  firebase = auth
+  firestore = db
+} else {
+  firebase = auth()
+  firestore = db()
+}
+
 /**
  * Helper function that checks whether an object exists or not.
  * @param  {Object} object  Any object that can be undefined or null.
@@ -77,8 +87,9 @@ export const addDocument = (email: string) => (dispatch, getState) => {
   //   snooze: 9 // TODO: This should be changed so snooze is not reset on login.
   // }
 
-  console.log(db)
-  // return db().collection('users').doc(email).get()
+  // console.log(email)
+  // console.log(firestore.collection('users').doc(email).get())
+  // return firestore.collection('users').doc(email).get()
   //   .then(
   //     doc => {
   //       console.log(doc)
@@ -88,7 +99,7 @@ export const addDocument = (email: string) => (dispatch, getState) => {
   //   .catch(error => dispatch(ActionCreators.addDocumentRejected(error.message)))
 
   // TODO: How do you mock this?
-  // return db().collection('users').doc(email).get()
+  // return firestore.collection('users').doc(email).get()
   //   .then(
   //     doc => {
   //       if (doc.exists) {
@@ -105,7 +116,7 @@ export const addDocument = (email: string) => (dispatch, getState) => {
   //         }
   //
   //         if (exists(doc.data().subscribers)) {
-  //           return db().collection('users').doc(email).set(
+  //           return firestore.collection('users').doc(email).set(
   //             {
   //               alertTimes: getState().inputs.alertTimes,
   //               checkinTime: user.checkinTime,
@@ -115,7 +126,7 @@ export const addDocument = (email: string) => (dispatch, getState) => {
   //             }
   //           )
   //         } else {
-  //           return db().collection('users').doc(email).set(
+  //           return firestore.collection('users').doc(email).set(
   //             {
   //               alertTimes: getState().inputs.alertTimes,
   //               checkinTime: user.checkinTime,
@@ -128,7 +139,7 @@ export const addDocument = (email: string) => (dispatch, getState) => {
   //         // doc.data() will be undefined in this case
   //         console.log('No such document!')
   //
-  //         return db().collection('users').doc(email).set(
+  //         return firestore.collection('users').doc(email).set(
   //           {
   //             alertTimes: getState().inputs.alertTimes,
   //             checkinTime: user.checkinTime,
@@ -167,13 +178,13 @@ export const checkin = () => (dispatch, getState) => {
 
   dispatch(ActionCreators.checkinRequested())
 
-  return db().collection('users').doc(getState().auth.user.email).update(
+  return firestore.collection('users').doc(getState().auth.user.email).update(
     {
       checkinTime: user.checkinTime
     }
   )
     .then(
-      () => db().collection('users').doc(getState().auth.user.email)
+      () => firestore.collection('users').doc(getState().auth.user.email)
         .update(
           { wasCheckedForAlerts: false }
         ),
@@ -216,7 +227,7 @@ export const getDocument = (
 ) => (dispatch, getState) => {
   dispatch(ActionCreators.getDocumentRequested())
 
-  return db().collection('users').doc(email).get()
+  return firestore.collection('users').doc(email).get()
     .then(
       doc => {
         if (doc.exists) {
@@ -226,7 +237,7 @@ export const getDocument = (
             console.log('Subscriber defined!')
           } else {
             console.log('Subscriber undefined!')
-            db().collection('users').doc(email).update({ subscribers: {} })
+            firestore.collection('users').doc(email).update({ subscribers: {} })
           }
         } else {
           // doc.data() will be undefined in this case
@@ -255,7 +266,7 @@ export const getDocument = (
               doc.data().subscribers[uid].includes(token)
                 ? doc.data().subscribers[uid]
                 : doc.data().subscribers[uid].concat([token])
-            db().collection('users').doc(email).update(
+            firestore.collection('users').doc(email).update(
               {
                 ['subscribers.' + uid]: subscriberData
               }
@@ -263,7 +274,7 @@ export const getDocument = (
           } else {
             console.log('Subscriber undefined!')
             const subscriberData = [getState().device.token]
-            db().collection('users').doc(email).update(
+            firestore.collection('users').doc(email).update(
               {
                 ['subscribers.' + uid]: subscriberData
               }
@@ -413,7 +424,7 @@ export const mutateInput = (
         ]
       }
 
-      return db().collection('users').doc(getState().auth.user.email).update(
+      return firestore.collection('users').doc(getState().auth.user.email).update(
         {
           alertTimes: inputsArray
         }
@@ -457,17 +468,18 @@ export const mutateInput = (
 export const register = (creds: Credential) => (dispatch, getState) => {
   dispatch(ActionCreators.registrationRequested())
 
-  return auth().createUserWithEmailAndPassword(creds.username, creds.password)
-    // .then(
-    //   userCredential => {
-    //     dispatch(addDocument(userCredential.user.email))
-    //     return userCredential
-    //   },
-    //   error => {
-    //     const errorMessage = new Error(error.message)
-    //     throw errorMessage
-    //   }
-    // )
+  return firebase.createUserWithEmailAndPassword(creds.username, creds.password)
+     .then(
+       userCredential => {
+         console.log(userCredential)
+         dispatch(addDocument(userCredential.user.email))
+         return userCredential
+       },
+       error => {
+         const errorMessage = new Error(error.message)
+         throw errorMessage
+       }
+     )
     // .then(
     //   userCredential => {
     //     dispatch(checkin())
@@ -505,7 +517,7 @@ export const removeInput = (id: string) => (dispatch, getState) => {
     input => input.id !== id
   )
 
-  return db().collection('users').doc(getState().auth.user.email).update(
+  return firestore.collection('users').doc(getState().auth.user.email).update(
     {
       alertTimes: inputsArray
     }
@@ -530,7 +542,7 @@ export const removeInput = (id: string) => (dispatch, getState) => {
 export const removeInputs = () => (dispatch, getState) => {
   dispatch(ActionCreators.removeInputsRequested())
 
-  return db().collection('users').doc(getState().auth.user.email).update(
+  return firestore.collection('users').doc(getState().auth.user.email).update(
     {
       alertTimes: []
     }
@@ -837,7 +849,7 @@ export const setShortestInterval = (
 ) => (dispatch, getState) => {
   dispatch(ActionCreators.setShortestIntervalRequested())
 
-  return db().collection('users').doc(getState().auth.user.email).update(
+  return firestore.collection('users').doc(getState().auth.user.email).update(
     { shortestInterval: interval }
   )
     .then(
@@ -863,7 +875,7 @@ export const setShortestInterval = (
 export const setSnooze = (snooze: number) => (dispatch, getState) => {
   dispatch(ActionCreators.setSnoozeRequested())
 
-  return db().collection('users').doc(getState().auth.user.email).update(
+  return firestore.collection('users').doc(getState().auth.user.email).update(
     { snooze: snooze }
   )
     .then(
@@ -1067,7 +1079,7 @@ export const signIn = (
 ) => (dispatch, getState) => {
   dispatch(ActionCreators.signinRequested())
 
-  return auth().signInWithEmailAndPassword(creds.username, creds.password)
+  return firebase.signInWithEmailAndPassword(creds.username, creds.password)
     .then(
       userCredential => {
         dispatch(addDocument(userCredential.user.email))
@@ -1116,7 +1128,7 @@ export const signIn = (
 export const signOut = () => (dispatch, getState) => {
   dispatch(ActionCreators.signoutRequested())
 
-  return auth().signOut()
+  return firebase.signOut()
     .then(
       () => dispatch(removeTimers()),
       error => {
@@ -1148,7 +1160,7 @@ export const signOut = () => (dispatch, getState) => {
  * @return {Promise}  A promise to update the check-in interval.
  */
 export const updateCheckinInterval = (interval: number) => (getState) => {
-  return db().collection('users').doc(getState().auth.user.email).update(
+  return firestore.collection('users').doc(getState().auth.user.email).update(
     {
       checkinInterval: interval
     }

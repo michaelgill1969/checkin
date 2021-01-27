@@ -131,8 +131,8 @@ describe(
       'registers user',
       () => {
         const spy1 = jest.spyOn(auth, 'createUserWithEmailAndPassword')
-        const spy2 = jest.spyOn(ActionCreators, 'registrationFulfilled')
-        // const spy3 = jest.spyOn(ActionCreators, 'addDocumentRequested')
+        const spy2 = jest.spyOn(ActionCreators, 'addDocumentRequested')
+        const spy3 = jest.spyOn(ActionCreators, 'registrationFulfilled')
         const credentials = { username: email1, password: password1 }
         const store = ConfigureStore().store
 
@@ -140,11 +140,9 @@ describe(
           .then(
             () => {
               // console.log(store.getState())
-              expect(spy1).toHaveBeenCalled()
+              expect(spy1).toHaveBeenCalledWith(email1, password1)
               expect(spy2).toHaveBeenCalled()
-              // expect(spy3).toHaveBeenCalledWith(
-              //   { creds: credentials, user: { email: email1 } }
-              // )
+              expect(spy3).toHaveBeenCalled()
               return null
             },
             error => {
