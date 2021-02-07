@@ -63,7 +63,6 @@ const exists = (object) => {
 export const addBuddy = (email: string) => (dispatch, getState) => {
   return Promise.resolve(dispatch(setListener(email)))
     .then(
-      () => dispatch(ActionCreators.addBuddyFulfilled(email)),
       error => {
         const errorMessage = new Error(error.message)
         throw errorMessage
