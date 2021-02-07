@@ -469,17 +469,16 @@ export const register = (creds: Credential) => (dispatch, getState) => {
   dispatch(ActionCreators.registrationRequested())
 
   return firebase.createUserWithEmailAndPassword(creds.username, creds.password)
-     .then(
-       userCredential => {
-         console.log(userCredential)
-         dispatch(addDocument(userCredential.user.email))
-         return userCredential
-       },
-       error => {
-         const errorMessage = new Error(error.message)
-         throw errorMessage
-       }
-     )
+    .then(
+      userCredential => {
+        dispatch(addDocument(userCredential.user.email))
+        return userCredential
+      },
+      error => {
+        const errorMessage = new Error(error.message)
+        throw errorMessage
+      }
+    )
     // .then(
     //   userCredential => {
     //     dispatch(checkin())
@@ -723,10 +722,10 @@ export const setListener = (
     .then(
       listener => exists(listener)
         ? dispatch(
-            ActionCreators.setListenerFulfilled(
-              getState().listener.listeners.concat(listener)
-            )
+          ActionCreators.setListenerFulfilled(
+            getState().listener.listeners.concat(listener)
           )
+        )
         : dispatch(
           ActionCreators.setListenerFulfilled(getState()().listener.listeners)
         ),
@@ -966,10 +965,10 @@ export const setTimer = (isTest:boolean = false) => (dispatch, getState) => {
     .then(
       timer => exists(timer)
         ? dispatch(
-            ActionCreators.setTimerFulfilled(
-              getState().timer.timers.concat(timer)
-            )
+          ActionCreators.setTimerFulfilled(
+            getState().timer.timers.concat(timer)
           )
+        )
         : dispatch(ActionCreators.setTimerFulfilled(getState().timer.timers)),
       error => {
         const errorMessage = new Error(error.message)

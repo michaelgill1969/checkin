@@ -76,6 +76,8 @@ const email1 = 'a@a.aa'
 // const email2 = 'b@b.bb'
 const password1 = 'A1111111'
 // const password2 = 'B1111111'
+const credentials1 = { username: email1, password: password1 }
+// const credentials2 = { username: email2, password: password2 }
 // const uid1 = email1
 // const uid2 = email2
 // const auth1 = { uid: uid1, email: email1 }
@@ -133,16 +135,17 @@ describe(
         const spy1 = jest.spyOn(auth, 'createUserWithEmailAndPassword')
         const spy2 = jest.spyOn(ActionCreators, 'addDocumentRequested')
         const spy3 = jest.spyOn(ActionCreators, 'registrationFulfilled')
-        const credentials = { username: email1, password: password1 }
         const store = ConfigureStore().store
 
-        return store.dispatch(ActionThunks.register(credentials))
+        return store.dispatch(ActionThunks.register(credentials1))
           .then(
             () => {
               // console.log(store.getState())
               expect(spy1).toHaveBeenCalledWith(email1, password1)
               expect(spy2).toHaveBeenCalled()
-              expect(spy3).toHaveBeenCalled()
+              expect(spy3).toHaveBeenCalledWith(
+                { creds: credentials1, user: { email: email1 } }
+              )
               return null
             },
             error => {
