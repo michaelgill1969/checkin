@@ -79,88 +79,78 @@ export const addBuddy = (email: string) => (dispatch, getState) => {
  * @return {Promise}  A promise to create a new Firebase document.
  */
 export const addDocument = (email: string) => (dispatch, getState) => {
-  // const now = (new Date()).toISOString()
-  // const user = {
-  //   checkinTime: now,
-  //   isSignedIn: true,
-  //   snooze: 9 // TODO: This should be changed so snooze is not reset on login.
-  // }
-
-  // console.log(email)
-  // console.log(firestore.collection('users').doc(email).get())
-  // return firestore.collection('users').doc(email).get()
-  //   .then(
-  //     doc => {
-  //       console.log(doc)
   dispatch(ActionCreators.addDocumentRequested())
-  //     }
-  //   )
-  //   .catch(error => dispatch(ActionCreators.addDocumentRejected(error.message)))
 
-  // TODO: How do you mock this?
-  // return firestore.collection('users').doc(email).get()
-  //   .then(
-  //     doc => {
-  //       if (doc.exists) {
-  //         console.log('Document data:', doc.data())
-  //
-  //         const deviceToken = getState().device.token
-  //         let deviceTokens = doc.data().deviceTokens
-  //         if (exists(deviceTokens)) {
-  //           if (!deviceTokens.includes(deviceToken)) {
-  //             deviceTokens.push(deviceToken)
-  //           }
-  //         } else {
-  //           deviceTokens = [deviceToken]
-  //         }
-  //
-  //         if (exists(doc.data().subscribers)) {
-  //           return firestore.collection('users').doc(email).set(
-  //             {
-  //               alertTimes: getState().inputs.alertTimes,
-  //               checkinTime: user.checkinTime,
-  //               deviceTokens: deviceTokens,
-  //               snooze: user.snooze,
-  //               subscribers: doc.data().subscribers
-  //             }
-  //           )
-  //         } else {
-  //           return firestore.collection('users').doc(email).set(
-  //             {
-  //               alertTimes: getState().inputs.alertTimes,
-  //               checkinTime: user.checkinTime,
-  //               deviceTokens: deviceTokens,
-  //               snooze: user.snooze
-  //             }
-  //           )
-  //         }
-  //       } else {
-  //         // doc.data() will be undefined in this case
-  //         console.log('No such document!')
-  //
-  //         return firestore.collection('users').doc(email).set(
-  //           {
-  //             alertTimes: getState().inputs.alertTimes,
-  //             checkinTime: user.checkinTime,
-  //             deviceTokens: [getState().device.token],
-  //             snooze: user.snooze
-  //           }
-  //         )
-  //       }
-  //     },
-  //     error => {
-  //       const errorMessage = new Error(error.message)
-  //       throw errorMessage
-  //     }
-  //   )
-  //   .then(
-  //     () => dispatch(ActionCreators.addDocumentFulfilled(user)),
-  //     error => {
-  //       const errorMessage = new Error(error.message)
-  //       throw errorMessage
-  //     }
-  //   )
-  //   .catch(error => dispatch(ActionCreators.addDocumentRejected(error.message)))
+  const now = (new Date()).toISOString()
+  const user = {
+    checkinTime: now,
+    isSignedIn: true,
+    snooze: 9 // TODO: This should be changed so snooze is not reset on login.
+  }
+
+  return firestore.collection('users').doc(email).get()
+    .then(
+      doc => {
+        if (doc.exists) {
+          console.log('Document data:', doc.data())
+
+          const deviceToken = getState().device.token
+          let deviceTokens = doc.data().deviceTokens
+          if (exists(deviceTokens)) {
+            if (!deviceTokens.includes(deviceToken)) {
+              deviceTokens.push(deviceToken)
+            }
+          } else {
+            deviceTokens = [deviceToken]
+          }
+
+          if (exists(doc.data().subscribers)) {
+            return firestore.collection('users').doc(email).set(
+              {
+                alertTimes: getState().inputs.alertTimes,
+                checkinTime: user.checkinTime,
+                deviceTokens: deviceTokens,
+                snooze: user.snooze,
+                subscribers: doc.data().subscribers
+              }
+            )
+          } else {
+            return firestore.collection('users').doc(email).set(
+              {
+                alertTimes: getState().inputs.alertTimes,
+                checkinTime: user.checkinTime,
+                deviceTokens: deviceTokens,
+                snooze: user.snooze
+              }
+            )
+          }
+        } else {
+          // doc.data() will be undefined in this case
+          console.log('No such document!')
+
+          return firestore.collection('users').doc(email).set(
+            {
+              alertTimes: getState().inputs.alertTimes,
+              checkinTime: user.checkinTime,
+              deviceTokens: [getState().device.token],
+              snooze: user.snooze
+            }
+          )
+        }
+      },
+      error => {
+        const errorMessage = new Error(error.message)
+        throw errorMessage
+      }
+    )
+    .then(
+      () => dispatch(ActionCreators.addDocumentFulfilled(user)),
+      error => {
+        const errorMessage = new Error(error.message)
+        throw errorMessage
+      }
+    )
+    .catch(error => dispatch(ActionCreators.addDocumentRejected(error.message)))
 }
 
 /**

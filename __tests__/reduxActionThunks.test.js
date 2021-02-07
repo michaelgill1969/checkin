@@ -133,8 +133,10 @@ describe(
       'registers user',
       () => {
         const spy1 = jest.spyOn(auth, 'createUserWithEmailAndPassword')
-        const spy2 = jest.spyOn(ActionCreators, 'addDocumentRequested')
-        const spy3 = jest.spyOn(ActionCreators, 'registrationFulfilled')
+        const spy2 = jest.spyOn(ActionCreators, 'registrationRequested')
+        const spy3 = jest.spyOn(ActionCreators, 'addDocumentRequested')
+        const spy4 = jest.spyOn(ActionCreators, 'addDocumentFulfilled')
+        const spy5 = jest.spyOn(ActionCreators, 'registrationFulfilled')
         const store = ConfigureStore().store
 
         return store.dispatch(ActionThunks.register(credentials1))
@@ -143,7 +145,9 @@ describe(
               // console.log(store.getState())
               expect(spy1).toHaveBeenCalledWith(email1, password1)
               expect(spy2).toHaveBeenCalled()
-              expect(spy3).toHaveBeenCalledWith(
+              expect(spy3).toHaveBeenCalled()
+              expect(spy4).toHaveBeenCalled()
+              expect(spy5).toHaveBeenCalledWith(
                 { creds: credentials1, user: { email: email1 } }
               )
               return null
