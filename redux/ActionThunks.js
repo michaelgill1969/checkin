@@ -144,7 +144,19 @@ export const addDocument = (email: string) => (dispatch, getState) => {
       }
     )
     .then(
-      () => dispatch(ActionCreators.addDocumentFulfilled(user)),
+      () => {
+        return Promise.resolve(firestore.collection('users').doc(email).get())
+      },
+      error => {
+        const errorMessage = new Error(error.message)
+        throw errorMessage
+      }
+    )
+    .then(
+      doc => {
+        console.log('Document data:', doc.data())
+        dispatch(ActionCreators.addDocumentFulfilled(user))
+      },
       error => {
         const errorMessage = new Error(error.message)
         throw errorMessage

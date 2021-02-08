@@ -158,7 +158,7 @@ describe(
             }
           )
           .catch(
-            error => console.error(error)
+            error => console.log(error)
           )
       }
     )
