@@ -62,12 +62,6 @@ const exists = (object) => {
  */
 export const addBuddy = (email: string) => (dispatch, getState) => {
   return Promise.resolve(dispatch(setListener(email)))
-    .then(
-      error => {
-        const errorMessage = new Error(error.message)
-        throw errorMessage
-      }
-    )
     .catch(error => dispatch(ActionCreators.addBuddyRejected(error.message)))
 }
 
