@@ -137,10 +137,10 @@ export const addDocument = (email: string) => (dispatch, getState) => {
         throw errorMessage
       }
     )
+    // TODO: Remove the following then amd the log after that when satisfied
+    // with tests..
     .then(
-      () => {
-        return Promise.resolve(firestore.collection('users').doc(email).get())
-      },
+      () => Promise.resolve(firestore.collection('users').doc(email).get()),
       error => {
         const errorMessage = new Error(error.message)
         throw errorMessage
@@ -150,6 +150,7 @@ export const addDocument = (email: string) => (dispatch, getState) => {
       doc => {
         console.log('Document data:', doc.data())
         dispatch(ActionCreators.addDocumentFulfilled(user))
+        return null
       },
       error => {
         const errorMessage = new Error(error.message)
