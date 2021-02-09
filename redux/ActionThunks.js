@@ -181,19 +181,10 @@ export const checkin = () => (dispatch, getState) => {
 
   return firestore.collection('users').doc(getState().auth.user.email).update(
     {
-      checkinTime: user.checkinTime
+      checkinTime: user.checkinTime,
+      wasCheckedForAlerts: false
     }
   )
-    .then(
-      () => firestore.collection('users').doc(getState().auth.user.email)
-        .update(
-          { wasCheckedForAlerts: false }
-        ),
-      error => {
-        const errorMessage = new Error(error.message)
-        throw errorMessage
-      }
-    )
     .then(
       () => dispatch(removeTimers()),
       error => {
