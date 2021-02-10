@@ -7,9 +7,12 @@ const documentSnapshot = {
 }
 const get = jest.fn(() => Promise.resolve(documentSnapshot))
 const set = jest.fn(
-  data => Promise.resolve(documentData = { ...documentData, data })
+  data => Promise.resolve(documentData = { ...documentData, ...data })
 )
-const doc = jest.fn(() => { return { set, get } })
+const update = jest.fn(
+  data => Promise.resolve(documentData = { ...documentData, ...data })
+)
+const doc = jest.fn(() => { return { get, set, update } })
 const collection = jest.fn(() => { return { doc } })
 
 db.collection = collection

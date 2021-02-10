@@ -148,7 +148,7 @@ export const addDocument = (email: string) => (dispatch, getState) => {
     )
     .then(
       doc => {
-        console.log('Document data:', doc.data())
+        console.log('addDocumentFulfilled:', doc.data())
         dispatch(ActionCreators.addDocumentFulfilled(user))
         return null
       },
@@ -168,34 +168,56 @@ export const addDocument = (email: string) => (dispatch, getState) => {
  * elapsed.
  * @return {Promise}        A promise to update the check-in time and interval.
  */
-export const checkin = () => (dispatch, getState) => {
+export const checkin = (email: string = '') => (dispatch, getState) => {
   const now = (new Date()).toISOString()
   const user = { checkinTime: now }
 
   dispatch(ActionCreators.checkinRequested())
 
-  return firestore.collection('users').doc(getState().auth.user.email).update(
-    {
-      checkinTime: user.checkinTime,
-      wasCheckedForAlerts: false
-    }
-  )
+  return firestore
+    .collection('users')
+    .doc(email === '' ? getState().auth.user.email : email)
+    .update(
+      {
+        checkinTime: user.checkinTime,
+        wasCheckedForAlerts: false
+      }
+    )
     .then(
-      () => dispatch(removeTimers()),
+      () => Promise.resolve(
+        firestore
+          .collection('users')
+          .doc(email === '' ? getState().auth.user.email : email)
+          .get()
+      ),
       error => {
         const errorMessage = new Error(error.message)
         throw errorMessage
       }
     )
     .then(
-      () => dispatch(ActionCreators.checkinFulfilled(user.checkinTime)),
+      doc => {
+        dispatch(removeTimers())
+        return doc
+      },
+      error => {
+        const errorMessage = new Error(error.message)
+        throw errorMessage
+      }
+    )
+    .then(
+      doc => {
+        console.log('checkinFulfilled:', doc.data())
+        dispatch(ActionCreators.checkinFulfilled(user.checkinTime))
+        return null
+      },
       error => {
         const errorMessage = new Error(error.message)
         throw errorMessage
       }
     )
     .catch(error => dispatch(ActionCreators.checkinRejected(error.message)))
-    .finally(() => { dispatch(setTimer()) })
+    .finally(dispatch(setTimer()))
 }
 
 /**
@@ -466,16 +488,16 @@ export const register = (creds: Credential) => (dispatch, getState) => {
         throw errorMessage
       }
     )
-    // .then(
-    //   userCredential => {
-    //     dispatch(checkin())
-    //     return userCredential
-    //   },
-    //   error => {
-    //     const errorMessage = new Error(error.message)
-    //     throw errorMessage
-    //   }
-    // )
+    .then(
+      userCredential => {
+        dispatch(checkin(creds.username))
+        return userCredential
+      },
+      error => {
+        const errorMessage = new Error(error.message)
+        throw errorMessage
+      }
+    )
     .then(
       userCredential => dispatch(
         ActionCreators.registrationFulfilled(
@@ -881,88 +903,90 @@ export const setSnooze = (snooze: number) => (dispatch, getState) => {
  * @return {Promise}            Promise to set a timer.
  */
 export const setTimer = (isTest:boolean = false) => (dispatch, getState) => {
-  const checkinAlert = () => {
-    Alert.alert(
-      'Check In?',
-      'Your buddy will be alerted if not.',
-      [
-        {
-          text: 'OK',
-          onPress: () => {
-            console.log('OK Pressed')
-            dispatch(removeTimers())
-            dispatch(checkin())
-          }
-        }
-      ],
-      { cancelable: false }
-    )
-  }
+  // const checkinAlert = () => {
+  //   Alert.alert(
+  //     'Check In?',
+  //     'Your buddy will be alerted if not.',
+  //     [
+  //       {
+  //         text: 'OK',
+  //         onPress: () => {
+  //           console.log('OK Pressed')
+  //           dispatch(removeTimers())
+  //           dispatch(checkin())
+  //         }
+  //       }
+  //     ],
+  //     { cancelable: false }
+  //   )
+  // }
 
+  console.log('!!!!!!!!!!!!!!!!!!!!!!!!!!')
   dispatch(ActionCreators.setTimerRequested())
+  return null
 
-  return Promise.resolve(
-    dispatch(
-      setTimerInterval(
-        getState().inputs.alertTimes,
-        getState().user.checkinTime
-      )
-    )
-  )
-    .then(
-      interval => {
-        dispatch(removeTimers())
-        return interval
-      },
-      error => {
-        const errorMessage = new Error(error.message)
-        throw errorMessage
-      }
-    )
-    .then(
-      interval => {
-        if (isTest) {
-          return interval
-        } else {
-          if (interval !== null) {
-            if (interval > 0) {
-              const timer = Promise.resolve(
-                setTimeout(
-                  () => {
-                    dispatch(setTimer(isTest))
-                  },
-                  interval
-                )
-              )
-              return timer
-            } else {
-              checkinAlert()
-              return null
-            }
-          } else {
-            return null
-          }
-        }
-      },
-      error => {
-        const errorMessage = new Error(error.message)
-        throw errorMessage
-      }
-    )
-    .then(
-      timer => exists(timer)
-        ? dispatch(
-          ActionCreators.setTimerFulfilled(
-            getState().timer.timers.concat(timer)
-          )
-        )
-        : dispatch(ActionCreators.setTimerFulfilled(getState().timer.timers)),
-      error => {
-        const errorMessage = new Error(error.message)
-        throw errorMessage
-      }
-    )
-    .catch(error => dispatch(ActionCreators.setTimerRejected(error.message)))
+  // return Promise.resolve(
+  //   dispatch(
+  //     setTimerInterval(
+  //       getState().inputs.alertTimes,
+  //       getState().user.checkinTime
+  //     )
+  //   )
+  // )
+  //   .then(
+  //     interval => {
+  //       dispatch(removeTimers())
+  //       return interval
+  //     },
+  //     error => {
+  //       const errorMessage = new Error(error.message)
+  //       throw errorMessage
+  //     }
+  //   )
+  //   .then(
+  //     interval => {
+  //       if (isTest) {
+  //         return interval
+  //       } else {
+  //         if (interval !== null) {
+  //           if (interval > 0) {
+  //             const timer = Promise.resolve(
+  //               setTimeout(
+  //                 () => {
+  //                   dispatch(setTimer(isTest))
+  //                 },
+  //                 interval
+  //               )
+  //             )
+  //             return timer
+  //           } else {
+  //             checkinAlert()
+  //             return null
+  //           }
+  //         } else {
+  //           return null
+  //         }
+  //       }
+  //     },
+  //     error => {
+  //       const errorMessage = new Error(error.message)
+  //       throw errorMessage
+  //     }
+  //   )
+  //   .then(
+  //     timer => exists(timer)
+  //       ? dispatch(
+  //         ActionCreators.setTimerFulfilled(
+  //           getState().timer.timers.concat(timer)
+  //         )
+  //       )
+  //       : dispatch(ActionCreators.setTimerFulfilled(getState().timer.timers)),
+  //     error => {
+  //       const errorMessage = new Error(error.message)
+  //       throw errorMessage
+  //     }
+  //   )
+  //   .catch(error => dispatch(ActionCreators.setTimerRejected(error.message)))
 }
 
 /**
