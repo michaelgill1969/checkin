@@ -643,13 +643,9 @@ export const setLastAlertTime = (lastAlertTime: string) => dispatch => {
  * following has checked in within the alotted interval plus the snooze or else
  * alert standby that the buddy has not checked in.
  * @param  {String} email   E-mail of the buddy to be added.
- * @param  {Boolean} isTest Whether called by unit test (optional).
  * @return {Promise}        Promise to create listener after interval.
  */
-export const setListener = (
-  email: string,
-  isTest: boolean = false
-) => (dispatch, getState) => {
+export const setListener = (email: string) => (dispatch, getState) => {
   const noCheckinAlert = () => {
     Alert.alert(
       'Check-In Alert',
@@ -700,27 +696,21 @@ export const setListener = (
     )
     .then(
       interval => {
-        if (isTest) {
-          return interval
-        } else {
-          if (interval !== null) {
-            if (interval > 0) {
-              const listener = Promise.resolve(
-                setTimeout(
-                  () => {
-                    dispatch(setListener(email, isTest))
-                  },
-                  interval
-                )
+        if (interval !== null) {
+          if (interval > 0) {
+            const listener = Promise.resolve(
+              setTimeout(
+                () => dispatch(setListener(email)),
+                interval
               )
-              return listener
-            } else {
-              noCheckinAlert()
-              return null
-            }
+            )
+            return listener
           } else {
+            noCheckinAlert()
             return null
           }
+        } else {
+          return null
         }
       },
       error => {
@@ -750,13 +740,11 @@ export const setListener = (
  * Set the interval for the setListener function.
  * @param   {Array} alertTimes  Array of scheduled alert times.
  * @param   {Date} checkinTime  Last time buddy checked in.
- * @param   {Boolean} isTest    Whether called by unit test (optional).
  * @return  {Integer} The interval between alerts.
  */
 export const setListenerInterval = (
   alertTimes: AlertTimes,
-  checkinTime: string,
-  isTest: boolean = false
+  checkinTime: string
 ) => (dispatch, getState) => {
   const now = (new Date()).toISOString()
   const nowInMs = (((((parseInt(now.slice(-13, -11), 10) * 60) +
@@ -899,10 +887,8 @@ export const setSnooze = (snooze: number) => (dispatch, getState) => {
 /**
  * Set a timer that will issue an alert for the currently authorized user to
  * check-in after an interval of time.
- * @param  {Boolean} isTest     Whether called by unit test (optional).
  * @return {Promise}            Promise to set a timer.
  */
-export const setTimer = (isTest:boolean = false) => (dispatch, getState) => {
   // const checkinAlert = () => {
   //   Alert.alert(
   //     'Check In?',
@@ -944,36 +930,6 @@ export const setTimer = (isTest:boolean = false) => (dispatch, getState) => {
   //     }
   //   )
   //   .then(
-  //     interval => {
-  //       if (isTest) {
-  //         return interval
-  //       } else {
-  //         if (interval !== null) {
-  //           if (interval > 0) {
-  //             const timer = Promise.resolve(
-  //               setTimeout(
-  //                 () => {
-  //                   dispatch(setTimer(isTest))
-  //                 },
-  //                 interval
-  //               )
-  //             )
-  //             return timer
-  //           } else {
-  //             checkinAlert()
-  //             return null
-  //           }
-  //         } else {
-  //           return null
-  //         }
-  //       }
-  //     },
-  //     error => {
-  //       const errorMessage = new Error(error.message)
-  //       throw errorMessage
-  //     }
-  //   )
-  //   .then(
   //     timer => exists(timer)
   //       ? dispatch(
   //         ActionCreators.setTimerFulfilled(
@@ -994,13 +950,11 @@ export const setTimer = (isTest:boolean = false) => (dispatch, getState) => {
  * @param   {Array} alertTimes  Array of scheduled alert times.
  * @param   {Date} checkinTime  Last time user checked in.
  * @param   {Array} now         Now as a JS Date object.
- * @param   {Boolean} isTest    Whether called by unit test (optional).
  * @return  {Integer}           Interval to wait before check-in alert.
  */
 export const setTimerInterval = (
   alertTimes: AlertTimes,
-  checkinTime: string,
-  isTest: boolean = false
+  checkinTime: string
 ) => (dispatch, getState) => {
   const now = (new Date()).toISOString()
   const nowInMs = (((((parseInt(now.slice(-13, -11), 10) * 60) +
@@ -1041,19 +995,6 @@ export const setTimerInterval = (
       .then(
         result => {
           dispatch(ActionCreators.setTimerIntervalFulfilled(result))
-          return result
-        },
-        error => {
-          const errorMessage = new Error(error.message)
-          throw errorMessage
-        }
-      )
-      .then(
-        result => {
-          if (!isTest) {
-            updateCheckinInterval(result)
-          }
-
           return result
         },
         error => {
