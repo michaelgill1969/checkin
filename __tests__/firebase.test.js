@@ -14,6 +14,10 @@ function getFirestore (auth) {
     .firestore()
 }
 
+beforeEach(
+  async () => await firebase.clearFirestoreData({ projectId: PROJECT_ID })
+)
+
 describe(
   'firebase',
   () => {
@@ -165,4 +169,8 @@ describe(
       }
     )
   }
+)
+
+afterAll(
+  async () => await firebase.clearFirestoreData({ projectId: PROJECT_ID })
 )
