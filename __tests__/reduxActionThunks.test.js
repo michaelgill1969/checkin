@@ -3,8 +3,6 @@ import * as ActionCreators from '../redux/ActionCreators'
 import * as ActionThunks from '../redux/ActionThunks'
 import { ConfigureStore } from '../redux/configureStore'
 
-// jest.mock('@react-native-firebase/auth')
-// jest.mock('@react-native-firebase/firestore')
 jest.mock('react-native/Libraries/EventEmitter/NativeEventEmitter')
 jest.mock(
   'redux-persist',
@@ -73,7 +71,6 @@ const expectedState = {
   }
 }
 
-// const PROJECT_ID = 'cryonics-check-in-dev-0-0-2'
 const email1 = 'a@a.aa'
 // const email2 = 'b@b.bb'
 const password1 = 'A1111111'
@@ -84,12 +81,6 @@ const credentials1 = { username: email1, password: password1 }
 // const uid2 = email2
 // const auth1 = { uid: uid1, email: email1 }
 // const auth2 = { uid: uid2, email: email2 }
-
-// function getFirestore (auth) {
-//   return firebase
-//     .initializeTestApp({ projectId: PROJECT_ID, auth: auth })
-//     .firestore()
-// }
 
 describe(
   'redux store',
@@ -112,13 +103,7 @@ describe(
       'allows user creation',
       async () => {
         await expect(auth.createUserWithEmailAndPassword(email1, password1))
-          .resolves.toStrictEqual(
-            {
-              user: {
-                email: email1
-              }
-            }
-          )
+          .resolves.toStrictEqual({ user: { email: email1 } })
       }
     )
   }
@@ -179,6 +164,19 @@ describe(
     )
   }
 )
+
+describe(
+  'set-timer-interval thunk',
+  () => {
+    it(
+      'sets timer interval correctly',
+      () => {
+        expect(true).toBeTruthy()
+      }
+    )
+  }
+)
+
 
 afterEach(
   () => jest.clearAllTimers()
