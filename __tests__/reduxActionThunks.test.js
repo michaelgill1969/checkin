@@ -17,7 +17,9 @@ jest.mock(
   }
 )
 
-jest.useFakeTimers()
+beforeEach(
+  () => jest.useFakeTimers()
+)
 
 const expectedState = {
   auth: {
@@ -89,10 +91,6 @@ const credentials1 = { username: email1, password: password1 }
 //     .firestore()
 // }
 
-// beforeEach(
-//   async () => await firebase.clearFirestoreData({ projectId: PROJECT_ID })
-// )
-
 describe(
   'redux store',
   () => {
@@ -153,15 +151,20 @@ describe(
               expect(spy2).toHaveBeenCalled()
               expect(spy3).toHaveBeenCalled()
               expect(spy4).toHaveBeenCalled()
-              expect(spy5).toHaveBeenCalled()
+              expect(spy5).toHaveBeenCalledTimes(2)
               expect(spy6).toHaveBeenCalled()
-              // expect(spy7).toHaveBeenCalled()
-              // expect(spy8).toHaveBeenCalled()
-              // expect(spy9).toHaveBeenCalled()
-              // expect(spy10).toHaveBeenCalled()
-              // expect(spy11).toHaveBeenCalledWith(
-              //   { creds: credentials1, user: { email: email1 } }
-              // )
+              expect(setTimeout).toHaveBeenLastCalledWith(
+                expect.any(Function),
+                60000
+              )
+              jest.runOnlyPendingTimers()
+              expect(spy7).toHaveBeenCalled()
+              expect(spy8).toHaveBeenCalledTimes(2)
+              expect(spy9).toHaveBeenCalled()
+              expect(spy10).toHaveBeenCalled()
+              expect(spy11).toHaveBeenCalledWith(
+                { creds: credentials1, user: { email: email1 } }
+              )
               return null
             },
             error => {
@@ -177,6 +180,6 @@ describe(
   }
 )
 
-// afterAll(
-//   async () => await firebase.clearFirestoreData({ projectId: PROJECT_ID })
-// )
+afterEach(
+  () => jest.clearAllTimers()
+)

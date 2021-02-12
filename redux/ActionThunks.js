@@ -137,18 +137,8 @@ export const addDocument = (email: string) => (dispatch, getState) => {
         throw errorMessage
       }
     )
-    // TODO: Remove the following then amd the log after that when satisfied
-    // with tests..
     .then(
-      () => Promise.resolve(firestore.collection('users').doc(email).get()),
-      error => {
-        const errorMessage = new Error(error.message)
-        throw errorMessage
-      }
-    )
-    .then(
-      doc => {
-        console.log('addDocumentFulfilled:', doc.data())
+      () => {
         dispatch(ActionCreators.addDocumentFulfilled(user))
         return null
       },
@@ -184,30 +174,8 @@ export const checkin = (email: string = '') => (dispatch, getState) => {
       }
     )
     .then(
-      () => Promise.resolve(
-        firestore
-          .collection('users')
-          .doc(email === '' ? getState().auth.user.email : email)
-          .get()
-      ),
-      error => {
-        const errorMessage = new Error(error.message)
-        throw errorMessage
-      }
-    )
-    .then(
-      doc => {
+      () => {
         dispatch(removeTimers())
-        return doc
-      },
-      error => {
-        const errorMessage = new Error(error.message)
-        throw errorMessage
-      }
-    )
-    .then(
-      doc => {
-        console.log('checkinFulfilled:', doc.data())
         dispatch(ActionCreators.checkinFulfilled(user.checkinTime))
         return null
       },
@@ -449,11 +417,9 @@ export const mutateInput = (
           error => dispatch(ActionCreators.mutateInputRejected(error.message))
         )
         .finally(
-          () => {
-            if (inputsArray.filter(alert => alert.validity).length > 0) {
-              dispatch(setTimer())
-            }
-          }
+          inputsArray.filter(alert => alert.validity).length > 0
+            ? dispatch(setTimer())
+            : null
         )
     } else if (getState().inputs.alertTimes == null) {
       throw new Error('Input array is null or undefined.')
@@ -540,7 +506,7 @@ export const removeInput = (id: string) => (dispatch, getState) => {
     .catch(
       error => dispatch(ActionCreators.removeInputsRejected(error.message))
     )
-    .finally(() => { dispatch(setTimer()) })
+    .finally(dispatch(setTimer()))
 }
 
 /**
@@ -565,7 +531,7 @@ export const removeInputs = () => (dispatch, getState) => {
     .catch(
       error => dispatch(ActionCreators.removeInputsRejected(error.message))
     )
-    .finally(() => { dispatch(setTimer()) })
+    .finally(dispatch(setTimer()))
 }
 
 /**
@@ -722,7 +688,7 @@ export const setListener = (email: string) => (dispatch, getState) => {
       listener => exists(listener)
         ? dispatch(
           ActionCreators.setListenerFulfilled(
-            getState().listener.listeners.concat(listener)
+            getState().listener.listeners.concat(listener.id)
           )
         )
         : dispatch(
@@ -889,60 +855,85 @@ export const setSnooze = (snooze: number) => (dispatch, getState) => {
  * check-in after an interval of time.
  * @return {Promise}            Promise to set a timer.
  */
-  // const checkinAlert = () => {
-  //   Alert.alert(
-  //     'Check In?',
-  //     'Your buddy will be alerted if not.',
-  //     [
-  //       {
-  //         text: 'OK',
-  //         onPress: () => {
-  //           console.log('OK Pressed')
-  //           dispatch(removeTimers())
-  //           dispatch(checkin())
-  //         }
-  //       }
-  //     ],
-  //     { cancelable: false }
-  //   )
-  // }
+export const setTimer = () => (dispatch, getState) => {
+  const checkinAlert = () => {
+    Alert.alert(
+      'Check In?',
+      'Your buddy will be alerted if not.',
+      [
+        {
+          text: 'OK',
+          onPress: () => {
+            console.log('OK Pressed')
+            dispatch(removeTimers())
+            dispatch(checkin())
+          }
+        }
+      ],
+      { cancelable: false }
+    )
+  }
 
-  console.log('!!!!!!!!!!!!!!!!!!!!!!!!!!')
   dispatch(ActionCreators.setTimerRequested())
-  return null
 
-  // return Promise.resolve(
-  //   dispatch(
-  //     setTimerInterval(
-  //       getState().inputs.alertTimes,
-  //       getState().user.checkinTime
-  //     )
-  //   )
-  // )
-  //   .then(
-  //     interval => {
-  //       dispatch(removeTimers())
-  //       return interval
-  //     },
-  //     error => {
-  //       const errorMessage = new Error(error.message)
-  //       throw errorMessage
-  //     }
-  //   )
-  //   .then(
-  //     timer => exists(timer)
-  //       ? dispatch(
-  //         ActionCreators.setTimerFulfilled(
-  //           getState().timer.timers.concat(timer)
-  //         )
-  //       )
-  //       : dispatch(ActionCreators.setTimerFulfilled(getState().timer.timers)),
-  //     error => {
-  //       const errorMessage = new Error(error.message)
-  //       throw errorMessage
-  //     }
-  //   )
-  //   .catch(error => dispatch(ActionCreators.setTimerRejected(error.message)))
+  return Promise.resolve(
+    // dispatch(
+    //   setTimerInterval(
+    //     getState().inputs.alertTimes,
+    //     getState().user.checkinTime
+    //   )
+    // )
+    60000
+  )
+    .then(
+      interval => {
+        dispatch(removeTimers())
+        return interval
+      },
+      error => {
+        const errorMessage = new Error(error.message)
+        throw errorMessage
+      }
+    )
+    .then(
+      interval => {
+        if (interval !== null) {
+          if (interval > 0) {
+            const timer = Promise.resolve(
+              setTimeout(
+                () => dispatch(setTimer()),
+                interval
+              )
+            )
+            return timer
+          } else {
+            console.log('Check-In Alert')
+            checkinAlert()
+            return null
+          }
+        } else {
+          return null
+        }
+      },
+      error => {
+        const errorMessage = new Error(error.message)
+        throw errorMessage
+      }
+    )
+    .then(
+      timer => exists(timer)
+        ? dispatch(
+          ActionCreators.setTimerFulfilled(
+            getState().timer.timers.concat(timer.id)
+          )
+        )
+        : dispatch(ActionCreators.setTimerFulfilled(getState().timer.timers)),
+      error => {
+        const errorMessage = new Error(error.message)
+        throw errorMessage
+      }
+    )
+    .catch(error => dispatch(ActionCreators.setTimerRejected(error.message)))
 }
 
 /**
