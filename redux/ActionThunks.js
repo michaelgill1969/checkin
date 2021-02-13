@@ -20,7 +20,8 @@
  * Check-In.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-// @flow
+// TODO: You need to add flow type-checking that was removed to suppress linter
+// warnings in Vim.
 import { Alert } from 'react-native'
 import moment from 'moment'
 import auth from '@react-native-firebase/auth'
@@ -965,6 +966,25 @@ export const setTimerInterval = (
       }
     }
   ).sort((el1, el2) => el1.timeInMs - el2.timeInMs)
+
+  console.log(
+    'Alert times: ', alertTimes, '\n',
+    'Valid alert times: ', alertTimes.filter(alert => alert.validity), '\n',
+    'Time slice: ', alertTimes.filter(alert => alert.validity).map(
+      alert => {
+        return {
+          timeInMs: ((((((parseInt(alert.time.slice(-13, -11), 10) * 60) +
+            parseInt(alert.time.slice(-10, -8), 10)) * 60) +
+            parseInt(alert.time.slice(-7, -5), 10)) * 1000) +
+            parseInt(alert.time.slice(-4, -1), 10) + nowToMidnight) % 86400000
+        }
+      }
+    ).sort((el1, el2) => el1.timeInMs - el2.timeInMs), '\n',
+    'Now: ', now, '\n',
+    'Now in milliseconds: ', nowInMs, '\n',
+    'Now to midnight: ', nowToMidnight, '\n',
+    'Alerts in milliseconds: ', alertsInMs
+  )
 
   if (alertsInMs.length !== 0) {
     const checkinInMs = ((((((parseInt(checkinTime.slice(-13, -11), 10) * 60) +

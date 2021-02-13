@@ -169,14 +169,48 @@ describe(
   'set-timer-interval thunk',
   () => {
     it(
-      'sets timer interval correctly',
+      'returns one-minute interval when there are no alerts',
       () => {
-        expect(true).toBeTruthy()
+        const store = ConfigureStore().store
+        // const spy1 = jest.spyOn(ActionCreators, 'setTimerIntervalRequested')
+
+        return store.dispatch(
+          ActionThunks.setTimerInterval([], null)
+        )
+          .then(
+            interval => {
+              expect(interval).toEqual(60000)
+              // expect(spy1).toHaveBeenCalled()
+              return null
+            }
+          )
+      }
+    )
+
+    it(
+      'requests timer interval',
+      () => {
+        const store = ConfigureStore().store
+        const spy1 = jest.spyOn(ActionCreators, 'setTimerIntervalRequested')
+
+        return store.dispatch(
+          ActionThunks.setTimerInterval(
+            [
+              { id: '123456789', time: '2021-02-13T12:00:00.000Z', validity: true }
+            ],
+            '2021-02-13T12:00:00.000Z'
+          )
+        )
+          .then(
+            interval => {
+              expect(spy1).toHaveBeenCalled()
+              return null
+            }
+          )
       }
     )
   }
 )
-
 
 afterEach(
   () => jest.clearAllTimers()
