@@ -209,6 +209,30 @@ describe(
           )
       }
     )
+
+    it(
+      'fulfills timer interval',
+      () => {
+        const store = ConfigureStore().store
+        const spy1 = jest.spyOn(ActionCreators, 'setTimerIntervalFulfilled')
+
+        return store.dispatch(
+          ActionThunks.setTimerInterval(
+            [
+              { id: '123456789', time: '2021-02-13T12:00:00.000Z', validity: true }
+            ],
+            '2021-02-13T12:00:00.000Z'
+          )
+        )
+          .then(
+            interval => {
+              // expect(true).toBeTruthy()
+              expect(spy1).toHaveBeenCalled()
+              return null
+            }
+          )
+      }
+    )
   }
 )
 
