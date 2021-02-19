@@ -55,6 +55,13 @@ const exists = (object) => {
 }
 
 /**
+ * Helper funtion that returns the current time and date.  It is need only so
+ * that it can be mocked during testing.
+ * @return (String)     Current date and time in ISO format.
+ */
+export const currentTime = () => (new Date()).toISOString()
+
+/**
  * Add a buddy to be be tracked by the current user.  First, a setListener
  * action creator is called with the buddy's e-mail.  After that promise is
  * returned, an action for add-buddy-fulfillment is initiated.
@@ -948,7 +955,7 @@ export const setTimerInterval = (
   alertTimes: AlertTimes,
   checkinTime: string
 ) => (dispatch, getState) => {
-  const now = (new Date()).toISOString()
+  const now = currentTime()
   const nowInMs = (((((parseInt(now.slice(-13, -11), 10) * 60) +
     parseInt(now.slice(-10, -8), 10)) * 60) +
     parseInt(now.slice(-7, -5), 10)) * 1000) +
@@ -968,6 +975,7 @@ export const setTimerInterval = (
   ).sort((el1, el2) => el1.timeInMs - el2.timeInMs)
 
   console.log(
+    'New Date: ', now, '\n', // new Date(172800000), '\n',
     'Alert times: ', alertTimes, '\n',
     'Valid alert times: ', alertTimes.filter(alert => alert.validity), '\n',
     'Time slice: ', alertTimes.filter(alert => alert.validity).map(

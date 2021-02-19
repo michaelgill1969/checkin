@@ -168,6 +168,12 @@ describe(
 describe(
   'set-timer-interval thunk',
   () => {
+    const mockDate = (new Date(172800000)).toISOString()
+    console.log(mockDate)
+    const spyDate = jest
+      .spyOn(ActionThunks, 'currentTime')
+      .mockImplementation(() => mockDate)
+
     it(
       'returns one-minute interval when there are no alerts',
       () => {
@@ -179,6 +185,7 @@ describe(
         )
           .then(
             interval => {
+              expect(spyDate).toHaveBeenCalled()
               expect(interval).toEqual(60000)
               // expect(spy1).toHaveBeenCalled()
               return null
@@ -196,13 +203,14 @@ describe(
         return store.dispatch(
           ActionThunks.setTimerInterval(
             [
-              { id: '123456789', time: '2021-02-13T12:00:00.000Z', validity: true }
+              { id: '123456789', time: '1970-01-03T12:00:00.000Z', validity: true }
             ],
             '2021-02-13T12:00:00.000Z'
           )
         )
           .then(
             interval => {
+              expect(spyDate).toHaveBeenCalled()
               expect(spy1).toHaveBeenCalled()
               return null
             }
@@ -227,6 +235,7 @@ describe(
           .then(
             interval => {
               // expect(true).toBeTruthy()
+              expect(spyDate).toHaveBeenCalled()
               expect(spy1).toHaveBeenCalled()
               return null
             }
