@@ -157,9 +157,7 @@ describe(
               throw errorMessage
             }
           )
-          .catch(
-            error => console.log(error)
-          )
+          .catch(error => console.log(error))
       }
     )
   }
@@ -170,51 +168,36 @@ describe(
   () => {
     const mockDate = (new Date(172800000)).toISOString()
     console.log(mockDate)
-    const spyDate = jest
-      .spyOn(ActionThunks, 'currentTime')
-      .mockImplementation(() => mockDate)
-
-    it(
-      'returns one-minute interval when there are no alerts',
-      () => {
-        const store = ConfigureStore().store
-        // const spy1 = jest.spyOn(ActionCreators, 'setTimerIntervalRequested')
-
-        return store.dispatch(
-          ActionThunks.setTimerInterval([], null)
-        )
-          .then(
-            interval => {
-              expect(spyDate).toHaveBeenCalled()
-              expect(interval).toEqual(60000)
-              // expect(spy1).toHaveBeenCalled()
-              return null
-            }
-          )
-      }
-    )
 
     it(
       'requests timer interval',
       () => {
         const store = ConfigureStore().store
-        const spy1 = jest.spyOn(ActionCreators, 'setTimerIntervalRequested')
+        const spy = jest.spyOn(ActionCreators, 'setTimerIntervalRequested')
 
         return store.dispatch(
           ActionThunks.setTimerInterval(
             [
-              { id: '123456789', time: '1970-01-03T12:00:00.000Z', validity: true }
+              {
+                id: '123456789',
+                time: '1970-01-03T12:00:00.000Z',
+                validity: true
+              }
             ],
             '2021-02-13T12:00:00.000Z'
           )
         )
           .then(
             interval => {
-              expect(spyDate).toHaveBeenCalled()
-              expect(spy1).toHaveBeenCalled()
+              expect(spy).toHaveBeenCalled()
               return null
+            },
+            error => {
+              const errorMessage = new Error(error.message)
+              throw errorMessage
             }
           )
+          .catch(error => console.log(error))
       }
     )
 
@@ -222,29 +205,97 @@ describe(
       'fulfills timer interval',
       () => {
         const store = ConfigureStore().store
-        const spy1 = jest.spyOn(ActionCreators, 'setTimerIntervalFulfilled')
+        const spy = jest.spyOn(ActionCreators, 'setTimerIntervalFulfilled')
 
         return store.dispatch(
           ActionThunks.setTimerInterval(
             [
-              { id: '123456789', time: '2021-02-13T12:00:00.000Z', validity: true }
+              {
+                id: '123456789',
+                time: '2021-02-13T12:00:00.000Z',
+                validity: true
+              }
             ],
             '2021-02-13T12:00:00.000Z'
           )
         )
           .then(
             interval => {
-              // expect(true).toBeTruthy()
-              expect(spyDate).toHaveBeenCalled()
-              expect(spy1).toHaveBeenCalled()
+              expect(spy).toHaveBeenCalled()
               return null
+            },
+            error => {
+              const errorMessage = new Error(error.message)
+              throw errorMessage
             }
           )
+          .catch(error => console.log(error))
+      }
+    )
+
+    it(
+      'returns one-minute interval when there are no alerts',
+      () => {
+        const store = ConfigureStore().store
+        const spy1 = jest.spyOn(ActionCreators, 'setTimerIntervalRequested')
+        const spy2 = jest.spyOn(ActionCreators, 'setTimerIntervalFulfilled')
+
+        return store.dispatch(
+          ActionThunks.setTimerInterval([], null)
+        )
+          .then(
+            interval => {
+              expect(spy1).toHaveBeenCalledTimes(1)
+              expect(spy2).toHaveBeenCalledTimes(1)
+              expect(interval).toEqual(60000)
+              return null
+            },
+            error => {
+              const errorMessage = new Error(error.message)
+              throw errorMessage
+            }
+          )
+          .catch(error => console.log(error))
+      }
+    )
+
+    it(
+      'rejects timer interval when there are alerts and check-in time is null',
+      () => {
+        const store = ConfigureStore().store
+        const alertTimes = [
+          {
+            id: '123456789',
+            time: '2021-02-13T12:00:00.000Z',
+            validity: true
+          }
+        ]
+        const spy1 = jest.spyOn(ActionCreators, 'setTimerIntervalRequested')
+        const spy2 = jest.spyOn(ActionCreators, 'setTimerIntervalRejected')
+
+        return store.dispatch(
+          ActionThunks.setTimerInterval(alertTimes, null)
+        )
+          .then(
+            interval => {
+              expect(spy1).toHaveBeenCalledTimes(1)
+              expect(spy2).toHaveBeenCalledTimes(1)
+              return null
+            },
+            error => {
+              const errorMessage = new Error(error.message)
+              throw errorMessage
+            }
+          )
+          .catch(error => console.log(error))
       }
     )
   }
 )
 
 afterEach(
-  () => jest.clearAllTimers()
+  () => {
+    jest.clearAllMocks()
+    jest.clearAllTimers()
+  }
 )

@@ -55,13 +55,6 @@ const exists = (object) => {
 }
 
 /**
- * Helper funtion that returns the current time and date.  It is need only so
- * that it can be mocked during testing.
- * @return (String)     Current date and time in ISO format.
- */
-export const currentTime = () => (new Date()).toISOString()
-
-/**
  * Add a buddy to be be tracked by the current user.  First, a setListener
  * action creator is called with the buddy's e-mail.  After that promise is
  * returned, an action for add-buddy-fulfillment is initiated.
@@ -953,9 +946,10 @@ export const setTimer = () => (dispatch, getState) => {
  */
 export const setTimerInterval = (
   alertTimes: AlertTimes,
-  checkinTime: string
+  checkinTime: string,
+  currentTime: string = null
 ) => (dispatch, getState) => {
-  const now = currentTime()
+  const now = currentTime !== null ? currentTime : (new Date()).toISOString()
   const nowInMs = (((((parseInt(now.slice(-13, -11), 10) * 60) +
     parseInt(now.slice(-10, -8), 10)) * 60) +
     parseInt(now.slice(-7, -5), 10)) * 1000) +
@@ -974,43 +968,49 @@ export const setTimerInterval = (
     }
   ).sort((el1, el2) => el1.timeInMs - el2.timeInMs)
 
-  console.log(
-    'New Date: ', now, '\n', // new Date(172800000), '\n',
-    'Alert times: ', alertTimes, '\n',
-    'Valid alert times: ', alertTimes.filter(alert => alert.validity), '\n',
-    'Time slice: ', alertTimes.filter(alert => alert.validity).map(
-      alert => {
-        return {
-          timeInMs: ((((((parseInt(alert.time.slice(-13, -11), 10) * 60) +
-            parseInt(alert.time.slice(-10, -8), 10)) * 60) +
-            parseInt(alert.time.slice(-7, -5), 10)) * 1000) +
-            parseInt(alert.time.slice(-4, -1), 10) + nowToMidnight) % 86400000
-        }
-      }
-    ).sort((el1, el2) => el1.timeInMs - el2.timeInMs), '\n',
-    'Now: ', now, '\n',
-    'Now in milliseconds: ', nowInMs, '\n',
-    'Now to midnight: ', nowToMidnight, '\n',
-    'Alerts in milliseconds: ', alertsInMs
-  )
+  // console.log(
+  //   'New Date: ', now, '\n', // new Date(172800000), '\n',
+  //   'Alert times: ', alertTimes, '\n',
+  //   'Valid alert times: ', alertTimes.filter(alert => alert.validity), '\n',
+  //   'Time slice: ', alertTimes.filter(alert => alert.validity).map(
+  //     alert => {
+  //       return {
+  //         timeInMs: ((((((parseInt(alert.time.slice(-13, -11), 10) * 60) +
+  //           parseInt(alert.time.slice(-10, -8), 10)) * 60) +
+  //           parseInt(alert.time.slice(-7, -5), 10)) * 1000) +
+  //           parseInt(alert.time.slice(-4, -1), 10) + nowToMidnight) % 86400000
+  //       }
+  //     }
+  //   ).sort((el1, el2) => el1.timeInMs - el2.timeInMs), '\n',
+  //   'Now: ', now, '\n',
+  //   'Now in milliseconds: ', nowInMs, '\n',
+  //   'Now to midnight: ', nowToMidnight, '\n',
+  //   'Alerts in milliseconds: ', alertsInMs
+  // )
+
+  dispatch(ActionCreators.setTimerIntervalRequested())
 
   if (alertsInMs.length !== 0) {
-    const checkinInMs = ((((((parseInt(checkinTime.slice(-13, -11), 10) * 60) +
-        parseInt(checkinTime.slice(-10, -8), 10)) * 60) +
-        parseInt(checkinTime.slice(-7, -5), 10)) * 1000) +
-        parseInt(checkinTime.slice(-4, -1), 10) + nowToMidnight) % 86400000
+    const promiseToCalculateInterval = new Promise(
+      (resolve, reject) => {
+        const checkinInMs = ((((((parseInt(checkinTime.slice(-13, -11), 10) * 60) +
+          parseInt(checkinTime.slice(-10, -8), 10)) * 60) +
+          parseInt(checkinTime.slice(-7, -5), 10)) * 1000) +
+          parseInt(checkinTime.slice(-4, -1), 10) + nowToMidnight) % 86400000
 
-    dispatch(ActionCreators.setTimerIntervalRequested())
+        const currentMoment = moment(now).millisecond()
+        const checkinMoment = moment(checkinTime).millisecond()
+        const interval = currentMoment - checkinMoment > 86400000
+          ? 0
+          : alertsInMs[alertsInMs.length - 1].timeInMs < checkinInMs
+            ? alertsInMs[0].timeInMs
+            : 0
 
-    const currentMoment = moment(now).millisecond()
-    const checkinMoment = moment(checkinTime).millisecond()
-    const interval = currentMoment - checkinMoment > 86400000
-      ? 0
-      : alertsInMs[alertsInMs.length - 1].timeInMs < checkinInMs
-        ? alertsInMs[0].timeInMs
-        : 0
+        resolve(interval)
+      }
+    )
 
-    return Promise.resolve(interval)
+    return promiseToCalculateInterval
       .then(
         result => {
           dispatch(ActionCreators.setTimerIntervalFulfilled(result))
@@ -1028,6 +1028,16 @@ export const setTimerInterval = (
       )
   } else {
     return Promise.resolve(60000)
+      .then(
+        result => {
+          dispatch(ActionCreators.setTimerIntervalFulfilled(result))
+          return result
+        },
+        error => {
+          const errorMessage = new Error(error.message)
+          throw errorMessage
+        }
+      )
       .catch(
         error => dispatch(
           ActionCreators.setTimerIntervalRejected(error.message)
