@@ -998,8 +998,14 @@ export const setTimerInterval = (
           parseInt(checkinTime.slice(-7, -5), 10)) * 1000) +
           parseInt(checkinTime.slice(-4, -1), 10) + nowToMidnight) % 86400000
 
-        const currentMoment = moment(now).millisecond()
-        const checkinMoment = moment(checkinTime).millisecond()
+        const currentMoment = new Date(now)
+        const checkinMoment = new Date(checkinTime)
+        // console.log(now)
+        // console.log(currentMoment)
+        // console.log(checkinTime)
+        // console.log(checkinMoment)
+        // console.log(alertsInMs[alertsInMs.length - 1].timeInMs)
+        console.log(currentMoment - checkinMoment)
         const interval = currentMoment - checkinMoment > 86400000
           ? 0
           : alertsInMs[alertsInMs.length - 1].timeInMs < checkinInMs
