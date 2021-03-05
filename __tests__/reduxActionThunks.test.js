@@ -157,7 +157,12 @@ describe(
               throw errorMessage
             }
           )
-          .catch(error => console.log(error))
+          .catch(
+            error => {
+              expect.assertions(12)
+              expect(error).not.toBeNull()
+            }
+          )
       }
     )
   }
@@ -166,9 +171,6 @@ describe(
 describe(
   'set-timer-interval thunk',
   () => {
-    const mockDate = (new Date(172800000)).toISOString()
-    console.log(mockDate)
-
     // it(
     //   'requests timer interval',
     //   () => {
@@ -197,7 +199,12 @@ describe(
     //           throw errorMessage
     //         }
     //       )
-    //       .catch(error => console.log(error))
+    //       .catch(
+    //         error => {
+    //           expect.assertions(1)
+    //           expect(error).not.toBeNull()
+    //         }
+    //       )
     //   }
     // )
 
@@ -229,7 +236,12 @@ describe(
     //           throw errorMessage
     //         }
     //       )
-    //       .catch(error => console.log(error))
+    //       .catch(
+    //         error => {
+    //           expect.assertions(1)
+    //           expect(error).not.toBeNull()
+    //         }
+    //       )
     //   }
     // )
 
@@ -255,7 +267,12 @@ describe(
     //           throw errorMessage
     //         }
     //       )
-    //       .catch(error => console.log(error))
+    //       .catch(
+    //         error => {
+    //           expect.assertions(3)
+    //           expect(error).not.toBeNull()
+    //         }
+    //       )
     //   }
     // )
 
@@ -287,7 +304,12 @@ describe(
     //           throw errorMessage
     //         }
     //       )
-    //       .catch(error => console.log(error))
+    //       .catch(
+    //         error => {
+    //           expect.assertions(2)
+    //           expect(error).not.toBeNull()
+    //         }
+    //       )
     //   }
     // )
 
@@ -299,21 +321,28 @@ describe(
         const alertTimes = [
           {
             id: '123456789',
-            time: '1970-01-03T11:59:59.999Z',
+            time: '1970-01-03T12:00:00.000Z',
             validity: true
           }
         ]
+        const checkinTime = (new Date(172800000))
+        const currentTime = (new Date(259200001))
         const spy1 = jest.spyOn(ActionCreators, 'setTimerIntervalRequested')
         const spy2 = jest.spyOn(ActionCreators, 'setTimerIntervalFulfilled')
 
         return store.dispatch(
-          ActionThunks.setTimerInterval(alertTimes, '1970-01-03T12:00:00.000Z', '1970-01-04T12:59:59.999Z')
+          ActionThunks.setTimerInterval(
+            alertTimes,
+            checkinTime.toISOString(),
+            currentTime.toISOString()
+          )
         )
           .then(
             interval => {
               expect(spy1).toHaveBeenCalledTimes(1)
               expect(spy2).toHaveBeenCalledTimes(1)
               expect(interval).toEqual(0)
+              expect(currentTime - checkinTime > 86400000).toBe(true)
               return null
             },
             error => {
@@ -321,7 +350,59 @@ describe(
               throw errorMessage
             }
           )
-          .catch(error => console.log(error))
+          .catch(
+            error => {
+              expect.assertions(4)
+              expect(error).not.toBeNull()
+            }
+          )
+      }
+    )
+
+    // TODO: Change the following logic so it tests what it says.
+    it(
+      'returns interval until next alert when alert time immediately before ' +
+      'the current time is less than the check-in time',
+      () => {
+        const store = ConfigureStore().store
+        const alertTimes = [
+          {
+            id: '123456789',
+            time: '1970-01-03T12:00:00.000Z',
+            validity: true
+          }
+        ]
+        const checkinTime = (new Date(172800000))
+        const currentTime = (new Date(259200001))
+        const spy1 = jest.spyOn(ActionCreators, 'setTimerIntervalRequested')
+        const spy2 = jest.spyOn(ActionCreators, 'setTimerIntervalFulfilled')
+
+        return store.dispatch(
+          ActionThunks.setTimerInterval(
+            alertTimes,
+            checkinTime.toISOString(),
+            currentTime.toISOString()
+          )
+        )
+          .then(
+            interval => {
+              expect(spy1).toHaveBeenCalledTimes(1)
+              expect(spy2).toHaveBeenCalledTimes(1)
+              expect(interval).toEqual(0)
+              expect(currentTime - checkinTime > 86400000).toBe(false)
+              return null
+            },
+            error => {
+              const errorMessage = new Error(error.message)
+              throw errorMessage
+            }
+          )
+          .catch(
+            error => {
+              expect.assertions(4)
+              expect(error).not.toBeNull()
+            }
+          )
       }
     )
   }

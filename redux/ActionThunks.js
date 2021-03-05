@@ -1006,6 +1006,9 @@ export const setTimerInterval = (
         // console.log(checkinMoment)
         // console.log(alertsInMs[alertsInMs.length - 1].timeInMs)
         console.log(currentMoment - checkinMoment)
+        console.log(currentMoment - checkinMoment > 86400000)
+        console.log(alertsInMs[alertsInMs.length - 1].timeInMs)
+        console.log(alertsInMs[alertsInMs.length - 1].timeInMs < checkinInMs)
         const interval = currentMoment - checkinMoment > 86400000
           ? 0
           : alertsInMs[alertsInMs.length - 1].timeInMs < checkinInMs
